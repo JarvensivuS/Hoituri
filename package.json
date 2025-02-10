@@ -1,0 +1,24 @@
+{
+  "name": "seniilisaver-monorepo",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "mobile-app",
+    "web-app"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:subdirs",
+    "install:subdirs": "cd backend && npm install && cd ../mobile-app && npm install && cd ../web-app && npm install",
+    "mobile": "cd mobile-app && npm start",
+    "web": "cd web-app && npm start",
+    "server": "cd backend && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run web\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "seniilisaver-monorepo": "file:"
+  }
+}
