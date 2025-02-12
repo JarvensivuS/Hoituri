@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoituri - Patient Overview</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="scripts.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-buttons">
+            <button onclick="window.history.back();">&#8592; Back</button>
+            <button onclick="window.location.href='index.html';">Home</button>
+        </div>
+        <h1>Asiakkaat</h1>
+        <div class="control">
+            <button id="addPatientBtn" onclick="window.location.href='patient-add.html'">Lisää uusi asiakas</button>
+            <input type="text" id="search" onkeyup="filterPatients()" placeholder="Etsi...">
+        </div>
+        <ul class="patient-list">
+            <li>Matti Meikäläinen</li>
+            <li>Maija Mehiläinen</li>
+            <li>Kalle Kääriäinen</li>
+            <li>Testi Mies</li>
+            <li>Kalevi Keihänen</li>
+        </ul>
+    </div>
+</body>
+</html>
