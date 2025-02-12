@@ -1,34 +1,31 @@
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, SafeAreaView, StatusBar } from "react-native";
+import HomeScreen from "./screens/HomeScreen";
+import SecondScreen from "./screens/SecondScreen";
 
-export default function Page() {
+const App = () => {
+  const [screen, setScreen] = useState("Home");
+
   return (
-    <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>Hello World</Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#6200EE" }}>
+      <StatusBar barStyle="light-content" backgroundColor="#6200EE" />
+      {/* Top Navigation Bar */}
+      <View style={{ height: 60, backgroundColor: "#6200EE", justifyContent: "center", alignItems: "center", flexDirection: "row", paddingHorizontal: 20 }}>
+        <TouchableOpacity onPress={() => setScreen("Home")} style={{ position: "absolute", left: 15, display: screen === "Home" ? "none" : "flex" }}>
+          <Text style={{ color: "white", fontSize: 18 }}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>{screen === "Home" ? "Home" : "Second Screen"}</Text>
+        <TouchableOpacity onPress={() => setScreen("SecondScreen")} style={{ position: "absolute", right: 15, display: screen === "Home" ? "flex" : "none" }}>
+          <Text style={{ color: "white", fontSize: 18 }}>Next →</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+      
+      {/* Screen Content */}
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20, backgroundColor: "white" }}>
+        {screen === "Home" ? <HomeScreen setScreen={setScreen} /> : <SecondScreen setScreen={setScreen} />}
+      </View>
+    </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 24,
-  },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-  },
-});
+export default App;
