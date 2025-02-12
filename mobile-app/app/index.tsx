@@ -12,11 +12,11 @@ const App = () => {
       {/* Top Navigation Bar */}
       <View style={{ height: 60, backgroundColor: "#6200EE", justifyContent: "center", alignItems: "center", flexDirection: "row", paddingHorizontal: 20 }}>
         <TouchableOpacity onPress={() => setScreen("Home")} style={{ position: "absolute", left: 15, display: screen === "Home" ? "none" : "flex" }}>
-          <Text style={{ color: "white", fontSize: 18 }}>← Back</Text>
+          <Text style={{ color: "white", fontSize: 18 }}>← Aloitus</Text>
         </TouchableOpacity>
-        <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>{screen === "Home" ? "Home" : "Second Screen"}</Text>
+        <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>{screen === "Home" ? "Aloitus" : "Sijainti"}</Text>
         <TouchableOpacity onPress={() => setScreen("SecondScreen")} style={{ position: "absolute", right: 15, display: screen === "Home" ? "flex" : "none" }}>
-          <Text style={{ color: "white", fontSize: 18 }}>Next →</Text>
+          <Text style={{ color: "white", fontSize: 18 }}>Sijainti →</Text>
         </TouchableOpacity>
       </View>
       
