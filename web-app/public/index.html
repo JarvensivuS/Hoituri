@@ -3,67 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SeniiliSaver Web Interface</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-        .nav-placeholder {
-            background-color: #eef2f7;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        .content-placeholder {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        .card {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 4px;
-            border: 1px solid #dee2e6;
-        }
-    </style>
+    <title>Hoituri - Main Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Hoituri Web Interface</h1>
+        <h1>Hoituri - Valikko</h1>
         <div class="nav-placeholder">
             Navigation Placeholder
         </div>
         <div class="content-placeholder">
             <div class="card">
-                <h2>Patient Overview</h2>
-                <p>This section will show patient monitoring data.</p>
+                <h2><a href="patient-overview.html" style="text-decoration: none; color: inherit;">Asiakkaat</a></h2>
+                <p>Asiakkaat ja tietojen hallinta.</p>
             </div>
             <div class="card">
-                <h2>Location Tracking</h2>
-                <p>This section will integrate with OpenStreetMap.</p>
+                <h2>GPS-paikannus</h2>
+                <p>Asiakkaan paikannustiedot OpenStreetMapin avulla.</p>
             </div>
             <div class="card">
                 <h2>Medication Schedule</h2>
                 <p>This section will show medication management interface.</p>
             </div>
             <div class="card">
-                <h2>Alerts & Notifications</h2>
-                <p>This section will display important alerts and notifications.</p>
+                <h2>Hälytykset ja muistutukset</h2>
+                <p>Hälytysten ja muistutusten hallinta.</p>
             </div>
         </div>
     </div>
