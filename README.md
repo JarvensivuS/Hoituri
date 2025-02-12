@@ -28,7 +28,7 @@ npm start
 
 ### 3. Workflow
 ```bash
-seniilisaver/
+hoituri/
 ├── backend/          # Express.js + TypeScript server (Samuli)
 ├── mobile-app/       # React Native/Expo app with TypeScript (Tuomas)
 └── web-app/          # React + TypeScript web interface (Sampo I. & Sampo S.)
