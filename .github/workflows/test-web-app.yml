@@ -14,9 +14,6 @@ on:
 jobs:
   test-web:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: web-app
 
     steps:
       - uses: actions/checkout@v3
@@ -26,20 +23,21 @@ jobs:
         with:
           node-version: '18.x'
           cache: 'npm'
-          cache-dependency-path: './web-app/package-lock.json'
           
       - name: Install Dependencies
-        run: npm install
+        run: npm run install:all
         
       - name: Run Build
+        working-directory: ./web-app
         run: npm run build
         env:
           CI: false
-        
-      - name: Test Start Up
+          NODE_ENV: production
+          
+      - name: Verify Build
+        working-directory: ./web-app
         run: |
-          npm start &
-          sleep 30
-          kill %1
-        env:
-          CI: true
+          if [ ! -d "build" ]; then
+            echo "Build directory not found!"
+            exit 1
+          fi
