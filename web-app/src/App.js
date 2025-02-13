@@ -1,18 +1,33 @@
-import React from 'react';
+import React from "react";
+import MedicationSchedule from "./components/MedicationSchedule";
 
 function App() {
   return (
     <div>
-      <h1>SeniiliSaver Web Interface</h1>
       <div>
-        <h2>Welcome to the Healthcare Provider Portal</h2>
-        <p>This interface will allow you to:</p>
-        <ul>
-          <li>Monitor patient locations</li>
-          <li>Manage medication schedules</li>
-          <li>View patient data</li>
-          <li>Receive alerts and notifications</li>
-        </ul>
+        <div class="container">
+          <h1>SeniiliSaver Web Interface</h1>
+          <div class="nav-placeholder">Navigation Placeholder</div>
+          <div class="content-placeholder">
+            <div class="card">
+              <h2>Patient Overview</h2>
+              <p>This section will show patient monitoring data.</p>
+            </div>
+            <div class="card">
+              <h2>Location Tracking</h2>
+              <p>This section will integrate with OpenStreetMap.</p>
+            </div>
+            <div class="card">
+              <MedicationSchedule />
+            </div>
+            <div class="card">
+              <h2>Alerts & Notifications</h2>
+              <p>
+                This section will display important alerts and notifications.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
