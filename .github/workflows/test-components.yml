@@ -1,8 +1,6 @@
 name: Verify Components
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -95,6 +93,9 @@ jobs:
       - name: Install Mobile Dependencies
         run: npm run install:subdirs
         
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
       - name: Verify Project Structure
         working-directory: ./mobile-app
         run: |
@@ -107,3 +108,11 @@ jobs:
             exit 1
           fi
           echo "Project structure verified"
+
+      - name: Run Expo Doctor
+        working-directory: ./mobile-app
+        run: expo doctor
+
+      - name: Run Expo Build Check
+        working-directory: ./mobile-app
+        run: expo prebuild
