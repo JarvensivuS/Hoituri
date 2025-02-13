@@ -1,5 +1,5 @@
 {
-  "name": "seniilisaver",
+  "name": "hoituri",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -34,6 +34,7 @@
     "expo-symbols": "~0.2.1",
     "expo-system-ui": "~4.0.7",
     "expo-web-browser": "~14.0.2",
+    "hoituri": "file:",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.7",
@@ -44,8 +45,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
-    "react-native-webview": "13.12.5",
-    "seniilisaver": "file:"
+    "react-native-webview": "13.12.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
