@@ -1,0 +1,30 @@
+{
+    "expo": {
+      "name": "Hoituri",
+      "slug": "hoituri",
+      "version": "1.0.0",
+      "orientation": "portrait",
+      "userInterfaceStyle": "light",
+      "assetBundlePatterns": [
+        "**/*"
+      ],
+      "ios": {
+        "supportsTablet": true,
+        "bundleIdentifier": "com.hoituri.app"
+      },
+      "android": {
+        "adaptiveIcon": {
+          "backgroundColor": "#ffffff"
+        },
+        "package": "com.hoituri.app"
+      },
+      "plugins": [
+        [
+          "expo-location",
+          {
+            "locationAlwaysAndWhenInUsePermission": "Allow Hoituri to use your location."
+          }
+        ]
+      ]
+    }
+  }
