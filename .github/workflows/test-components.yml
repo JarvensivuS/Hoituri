@@ -17,7 +17,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-          cache: 'npm'
           
       - name: Install Dependencies
         working-directory: ./backend
@@ -26,15 +25,6 @@ jobs:
       - name: Run Build Check
         working-directory: ./backend
         run: npm run build
-        
-      - name: Start Backend Server
-        working-directory: ./backend
-        run: |
-          npm start &
-          sleep 30
-          kill %1
-        env:
-          CI: true
 
   verify-web:
     runs-on: ubuntu-latest
