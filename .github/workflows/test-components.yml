@@ -1,8 +1,6 @@
 name: Verify Components
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -17,6 +15,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
+          cache: 'npm'
           
       - name: Install Dependencies
         working-directory: ./backend
@@ -25,6 +24,15 @@ jobs:
       - name: Run Build Check
         working-directory: ./backend
         run: npm run build
+        
+      - name: Start Backend Server
+        working-directory: ./backend
+        run: |
+          npm start &
+          sleep 30
+          kill %1
+        env:
+          CI: true
 
   verify-web:
     runs-on: ubuntu-latest
@@ -85,6 +93,9 @@ jobs:
       - name: Install Mobile Dependencies
         run: npm run install:subdirs
         
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
       - name: Verify Project Structure
         working-directory: ./mobile-app
         run: |
@@ -97,3 +108,7 @@ jobs:
             exit 1
           fi
           echo "Project structure verified"
+
+      - name: Run Expo Build Check
+        working-directory: ./mobile-app
+        run: expo prebuild
