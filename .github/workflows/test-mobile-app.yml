@@ -2,13 +2,10 @@ name: Test Mobile App
 
 on:
   push:
-    branches: [ main, develop ]
-    paths:
-      - 'mobile/**'
+    branches:
+      - '**'  
   pull_request:
     branches: [ main, develop ]
-    paths:
-      - 'mobile/**'
 
 jobs:
   test-mobile:

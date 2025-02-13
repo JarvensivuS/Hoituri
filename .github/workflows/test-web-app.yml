@@ -2,13 +2,10 @@ name: Test Web App
 
 on:
   push:
-    branches: [ main, develop ]
-    paths:
-      - 'web/**'
+    branches:
+      - '**'  
   pull_request:
     branches: [ main, develop ]
-    paths:
-      - 'web/**'
 
 jobs:
   test-web:
