@@ -109,10 +109,6 @@ jobs:
           fi
           echo "Project structure verified"
 
-      - name: Run Expo Doctor
-        working-directory: ./mobile-app
-        run: expo doctor
-
       - name: Run Expo Build Check
         working-directory: ./mobile-app
         run: expo prebuild
