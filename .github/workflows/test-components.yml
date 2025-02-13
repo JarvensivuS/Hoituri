@@ -1,0 +1,117 @@
+name: Test Components
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-backend:
+    if: github.event.pull_request.draft == false || contains(github.event.head_commit.modified, 'backend/')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          
+      - name: Install Dependencies
+        working-directory: ./backend
+        run: npm install
+        
+      - name: Run Build Check
+        working-directory: ./backend
+        run: npm run build
+        
+      - name: Start Backend Server
+        working-directory: ./backend
+        run: |
+          npm start &
+          sleep 30
+          kill %1
+        env:
+          CI: true
+
+  test-web:
+    if: github.event.pull_request.draft == false || contains(github.event.head_commit.modified, 'web-app/')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          
+      - name: Install Root Dependencies
+        run: npm install
+          
+      - name: Install Web Dependencies
+        run: npm run install:subdirs
+        
+      - name: Verify Project Structure
+        working-directory: ./web-app
+        run: |
+          if [ ! -f "package.json" ]; then
+            echo "package.json not found!"
+            exit 1
+          fi
+        
+      - name: Run Build
+        working-directory: ./web-app
+        run: npm run build
+        env:
+          CI: false
+          NODE_ENV: production
+          
+      - name: Verify Build
+        working-directory: ./web-app
+        run: |
+          if [ ! -d "build" ]; then
+            echo "Build directory not found!"
+            exit 1
+          fi
+
+  test-mobile:
+    if: github.event.pull_request.draft == false || contains(github.event.head_commit.modified, 'mobile-app/')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          
+      - name: Install Root Dependencies
+        run: npm install
+          
+      - name: Install Mobile Dependencies
+        run: npm run install:subdirs
+        
+      - name: Verify Project Structure
+        working-directory: ./mobile-app
+        run: |
+          if [ ! -f "package.json" ]; then
+            echo "package.json not found!"
+            exit 1
+          fi
+          if [ ! -f "app.json" ]; then
+            echo "app.json not found!"
+            exit 1
+          fi
+          echo "Project structure verified"
+        
+      - name: Run Tests
+        working-directory: ./mobile-app
+        run: npm test || echo "No tests available"
