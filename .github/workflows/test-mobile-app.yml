@@ -3,9 +3,13 @@ name: Test Mobile App
 on:
   push:
     branches:
-      - '**'  
+      - '**'
+    paths:
+      - 'mobile-app/**' 
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'mobile-app/**' 
 
 jobs:
   test-mobile:
@@ -21,17 +25,17 @@ jobs:
           cache: 'npm'
           
       - name: Install Dependencies
-        working-directory: ./mobile
+        working-directory: ./mobile-app 
         run: |
           npm install
           npx expo install
         
       - name: Build Check
-        working-directory: ./mobile
+        working-directory: ./mobile-app 
         run: npx expo prebuild
         
       - name: Start Expo
-        working-directory: ./mobile
+        working-directory: ./mobile-app 
         run: |
           npx expo start &
           sleep 45
