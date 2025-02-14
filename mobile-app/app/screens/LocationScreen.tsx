@@ -2,17 +2,17 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import styles from "../styles"; // 🔹 Importoidaan tyylit
 
-interface HomeScreenProps {
+interface LocationScreenProps {
   setScreen: (screen: string) => void;
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
+const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
   return (
     <View style={styles.ScreenContainer}>
-      <Text style={styles.ScreenText}>Tänne muistutuksia yms ?</Text>
+      <Text style={styles.ScreenText}>GPS hommat tänne</Text>
 
     </View>
   );
 };
 
-export default HomeScreen;
+export default LocationScreen;
