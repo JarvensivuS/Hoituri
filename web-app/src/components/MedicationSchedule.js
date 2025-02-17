@@ -89,7 +89,7 @@ const MedicationSchedule = () => {
             value={newTime}
             onChange={handleTimeChange}
             placeholder="00:00"
-            maxLength={5} // No more than five numbers as in hh:MM
+            maxLength={5}
             style={{ margin: "5px", padding: "5px" }}
           />
           <select
@@ -97,7 +97,7 @@ const MedicationSchedule = () => {
             onChange={(e) => setNewDay(e.target.value)}
             style={{ margin: "5px", padding: "5px" }}
           >
-            {/* A list of weekdays*/}
+            {/*list of weekdays*/}
             {weekdays.map((day, index) => (
               <option key={index} value={day}>
                 {day}
