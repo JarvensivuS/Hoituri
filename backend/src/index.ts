@@ -1,12 +1,14 @@
 import express from 'express';
+import userRoutes from './routes/user.route';
+import prescriptionRoutes from './routes/prescription.route';
 
 const app = express();
-const port = 3001;
 
-app.get('/', (req, res) => {
-  res.send('Hello from Hoituri backend!');
-});
+app.use(express.json());
+app.use('/api', userRoutes);
+app.use('/api', prescriptionRoutes);
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
