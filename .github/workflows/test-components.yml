@@ -18,9 +18,9 @@ jobs:
           cache: 'npm'
           
       - name: Create Firebase Credentials File
-        working-directory: ./backend/src
+        working-directory: ./backend
         run: |
-          echo '${{ secrets.DATABASE_SECRET_KEY }}' > DATABASE_SECRET_KEY.json
+          echo '${{ secrets.DATABASE_SECRET_KEY }}' > src/config/DATABASE_SECRET_KEY.json
           
       - name: Install Dependencies
         working-directory: ./backend
