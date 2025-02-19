@@ -1,3 +1,6 @@
+# .APIKeys
+DATABASE_SECRET_KEY.json
+
 # Dependencies
 node_modules
 **/node_modules

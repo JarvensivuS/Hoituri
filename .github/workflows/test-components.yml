@@ -1,0 +1,119 @@
+name: Verify Components
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          
+      - name: Create Firebase Credentials File
+        working-directory: ./backend
+        run: |
+          echo '${{ secrets.DATABASE_SECRET_KEY }}' > src/config/DATABASE_SECRET_KEY.json
+          
+      - name: Install Dependencies
+        working-directory: ./backend
+        run: npm install
+        
+      - name: Run Build Check
+        working-directory: ./backend
+        run: npm run build
+        
+      - name: Start Backend Server
+        working-directory: ./backend
+        run: |
+          npm start &
+          sleep 30
+          kill %1
+        env:
+          CI: true
+
+  verify-web:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          
+      - name: Install Root Dependencies
+        run: npm install
+          
+      - name: Install Web Dependencies
+        run: npm run install:subdirs
+        
+      - name: Verify Project Structure
+        working-directory: ./web-app
+        run: |
+          if [ ! -f "package.json" ]; then
+            echo "package.json not found!"
+            exit 1
+          fi
+        
+      - name: Run Build
+        working-directory: ./web-app
+        run: npm run build
+        env:
+          CI: false
+          NODE_ENV: production
+          
+      - name: Verify Build
+        working-directory: ./web-app
+        run: |
+          if [ ! -d "build" ]; then
+            echo "Build directory not found!"
+            exit 1
+          fi
+
+  verify-mobile:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          
+      - name: Install Root Dependencies
+        run: npm install
+          
+      - name: Install Mobile Dependencies
+        run: npm run install:subdirs
+        
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
+      - name: Verify Project Structure
+        working-directory: ./mobile-app
+        run: |
+          if [ ! -f "package.json" ]; then
+            echo "package.json not found!"
+            exit 1
+          fi
+          if [ ! -f "app.json" ]; then
+            echo "app.json not found!"
+            exit 1
+          fi
+          echo "Project structure verified"
+
+      - name: Run Expo Build Check
+        working-directory: ./mobile-app
+        run: expo prebuild
