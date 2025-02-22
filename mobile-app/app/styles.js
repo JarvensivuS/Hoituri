@@ -53,10 +53,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   ScreenText: {
-    fontSize: 40,
+    fontSize: 18,
     color: "#333",
+  },
+  map: {
+    width: "100%",
+    height: "80%",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
   },
   
 });
