@@ -18,6 +18,9 @@ npm install expo-router
 
 cd mobile-app
 npm install react-native-maps expo-location
+
+cd mobile-app
+npm install react-native-webview
 ```	
 ### 2. Verify	
 ```bash	
