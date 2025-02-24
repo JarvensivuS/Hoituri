@@ -1,3 +1,4 @@
+// styles.js
 import { StyleSheet } from "react-native";
 
 const STATUSBAR_COLOR = "#6200EE"; // StatusBar color is blue
@@ -8,11 +9,6 @@ const styles = StyleSheet.create({
     backgroundColor: STATUSBAR_COLOR,
   },
   statusBar: {
-    backgroundColor: STATUSBAR_COLOR, 
-  },
-
-  safeArea: {
-    flex:1,
     backgroundColor: STATUSBAR_COLOR,
   },
   topNav: {
@@ -42,13 +38,9 @@ const styles = StyleSheet.create({
   },
   screenContent: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
     backgroundColor: "white",
   },
-
-  // Screen styles
   ScreenContainer: {
     flex: 1,
     justifyContent: "center",
@@ -59,17 +51,44 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#333",
   },
-  map: {
-    width: "100%",
-    height: "80%",
-  },
   errorText: {
     color: "red",
     textAlign: "center",
     marginTop: 10,
   },
-  
-});
 
+  // --- Uudet tai muokatut tyylit LocationScreenille ---
+  locationScreenContainer: {
+    flex: 1,
+  },
+  headerContainer: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  mapContainer: {
+    flex: 1,
+    width: "100%",
+  },
+  webview: {
+    flex: 1,
+    width: "100%",
+  },
+  bottomContainer: {
+    padding: 10,
+    alignItems: "center",
+  },
+  homeButton: {
+    backgroundColor: "#6200EE",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  homeButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
+});
 
 export default styles;
