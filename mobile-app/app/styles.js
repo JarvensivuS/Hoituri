@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  // --- Uudet tai muokatut tyylit LocationScreenille ---
+  // LocationScreen-tyylit
   locationScreenContainer: {
     flex: 1,
   },
@@ -89,6 +89,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
   },
+  warningText: {
+    color: "red",
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center", marginBottom: 5
+ },
 });
 
 export default styles;
