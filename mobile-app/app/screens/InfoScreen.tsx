@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import styles from "../styles"; // 🔹 Importoidaan tyylit
+import styles from "../styles"; // 🔹 Importing styles
 
 interface InfoScreenProps {
   setScreen: (screen: string) => void;

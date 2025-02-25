@@ -1,42 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ActivityIndicator, Alert, TouchableOpacity } from "react-native";
+// screens/LocationScreen.tsx
+import React, { useContext, useMemo } from "react";
+import { View, Text, Alert, TouchableOpacity, ActivityIndicator } from "react-native";
 import { WebView } from "react-native-webview";
-import * as Location from "expo-location";
-import styles from "../styles"; // Importoidaan tyylit
+import { LocationContext } from "../components/LocationTracker";
+import { HomeContext } from "../components/HomeContext";
+import styles from "../styles";
 
 interface LocationScreenProps {
   setScreen: (screen: string) => void;
 }
 
 const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { location } = useContext(LocationContext);
+  const { homeSet, homeLocation, setHomeSet, setHomeLocation } = useContext(HomeContext);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Sijaintilupa hylätty", "Salli sijainti asetuksista käyttääksesi karttaa.", [{ text: "OK" }]);
-          setLoading(false);
-          return;
-        }
-
-        let locationData = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-        setLocation({
-          latitude: locationData.coords.latitude,
-          longitude: locationData.coords.longitude,
-        });
-      } catch (error) {
-        console.error("Virhe haettaessa sijaintia:", error);
-        Alert.alert("Virhe", "Sijaintia ei voitu hakea.", [{ text: "OK" }]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
-
-  if (loading) {
+  if (!location) {
     return (
       <View style={[styles.locationScreenContainer, { alignItems: "center", justifyContent: "center" }]}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -44,73 +22,86 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
     );
   }
 
-  if (!location) {
-    return (
-      <View style={[styles.locationScreenContainer, { alignItems: "center", justifyContent: "center" }]}>
-        <Text style={styles.errorText}>Sijaintia ei voitu hakea</Text>
-      </View>
-    );
-  }
+  const outsideHome = useMemo(() => {
+    if (homeSet && homeLocation) {
+      const latOffset = 50 / 111320;
+      const lngOffset = 50 / (111320 * Math.cos(homeLocation.latitude * Math.PI / 180));
+      const minLat = homeLocation.latitude - latOffset / 2;
+      const maxLat = homeLocation.latitude + latOffset / 2;
+      const minLng = homeLocation.longitude - lngOffset / 2;
+      const maxLng = homeLocation.longitude + lngOffset / 2;
+      return (
+        location.latitude < minLat ||
+        location.latitude > maxLat ||
+        location.longitude < minLng ||
+        location.longitude > maxLng
+      );
+    }
+    return false;
+  }, [homeSet, homeLocation, location]);
 
-  // HTML-sisältö Leaflet-kartalle
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-        <style>
-          html, body, #map {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-          }
-        </style>
-      </head>
-      <body>
-        <div id="map"></div>
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-        <script>
-          var map = L.map('map').setView([${location.latitude}, ${location.longitude}], 16);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(map);
-          L.marker([${location.latitude}, ${location.longitude}]).addTo(map)
-            .bindPopup("Olet tässä")
-            .openPopup();
-        </script>
-      </body>
-    </html>
-  `;
+  const getHtmlContent = (): string => {
+    let rectangleCode = "";
+    if (homeSet && homeLocation) {
+      rectangleCode = `
+        var latOffset = 50 / 111320; 
+        var lngOffset = 50 / (111320 * Math.cos(${homeLocation.latitude} * Math.PI / 180));
+        var southWest = [${homeLocation.latitude} - latOffset/2, ${homeLocation.longitude} - lngOffset/2];
+        var northEast = [${homeLocation.latitude} + latOffset/2, ${homeLocation.longitude} + lngOffset/2];
+        var bounds = [southWest, northEast];
+        var homeArea = L.rectangle(bounds, { color: "red", weight: 2 });
+        homeArea.addTo(map);
+      `;
+    }
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+          <style>
+            html, body, #map { height: 100%; width: 100%; margin: 0; padding: 0; }
+          </style>
+        </head>
+        <body>
+          <div id="map"></div>
+          <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+          <script>
+            var map = L.map('map').setView([${location.latitude}, ${location.longitude}], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            L.marker([${location.latitude}, ${location.longitude}]).addTo(map)
+              .bindPopup("Olet tässä")
+              .openPopup();
+            ${rectangleCode}
+          </script>
+        </body>
+      </html>
+    `;
+  };
+
+  const handleSetHome = () => {
+    setHomeLocation(location);
+    setHomeSet(true);
+    Alert.alert("Koti asetettu", "Oletus kotisijainti on asetettu.");
+  };
 
   return (
     <View style={styles.locationScreenContainer}>
-      {/* Header: Keskitetyt lat/long-tekstit */}
       <View style={styles.headerContainer}>
+        {homeSet && outsideHome && (
+          <Text style={styles.warningText}>OLET KODIN ULKOPUOLELLA!</Text>
+        )}
         <Text style={styles.ScreenText}>Latitude: {location.latitude.toFixed(6)}</Text>
         <Text style={styles.ScreenText}>Longitude: {location.longitude.toFixed(6)}</Text>
       </View>
-
-      {/* Kartta vie tilan */}
       <View style={styles.mapContainer}>
-        <WebView
-          originWhitelist={["*"]}
-          source={{ html: htmlContent }}
-          style={styles.webview}
-        />
+        <WebView originWhitelist={["*"]} source={{ html: getHtmlContent() }} style={styles.webview} />
       </View>
-
-      {/* Alue, jossa nappi "Aseta koti" */}
       <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            // Lisää toiminnallisuus tähän, esim. aseta koti -toiminto
-            Alert.alert("Koti asetettu", "Oletus kotisijainti on asetettu.");
-          }}
-          style={styles.homeButton}
-        >
+        <TouchableOpacity onPress={handleSetHome} style={styles.homeButton}>
           <Text style={styles.homeButtonText}>Aseta koti</Text>
         </TouchableOpacity>
       </View>
