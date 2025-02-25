@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+
+// TODO GET doctor data from database
 function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -19,14 +21,14 @@ function Login({ onLogin }) {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Username"
+          placeholder="Käyttäjänimi"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Salasana"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
