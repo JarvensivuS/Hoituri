@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+//TODO GET AND SET patients from and to database
+
 const PatientView = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [patients, setPatients] = useState([

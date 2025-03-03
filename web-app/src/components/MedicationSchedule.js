@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+//TODO GET AND SET medications from and to database
+
 const MedicationSchedule = () => {
   const [reminder, setReminder] = useState([]);
   const [newMedicine, setNewMedicine] = useState("");

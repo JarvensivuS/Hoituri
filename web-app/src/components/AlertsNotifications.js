@@ -1,5 +1,6 @@
 import React from 'react'
 
+//TODO GET alerts and notifications from database
 const AlertsNotifications = () => {
     const notifications = [
         { id: 1, type: "alert", message: "Mummo kaatunut" },
