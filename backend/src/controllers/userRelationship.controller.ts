@@ -2,10 +2,13 @@ import { Request, Response } from 'express';
 import { db } from '../config/firebase';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
-
+/**
+ * Update user relationships
+ * This handler manages doctor-patient and caretaker-patient relationships
+ */
 export const updateUserRelationships = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.params; // The user being modified
     const { doctorId, caretakerId, action } = req.body;
     const requestingUser = (req as AuthenticatedRequest).user;
 

@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { Query, DocumentData } from 'firebase-admin/firestore';
 import bcrypt from 'bcrypt';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
-
+import admin from 'firebase-admin';
 const VALID_ROLES = ['doctor', 'patient', 'caretaker'] as const;
 type UserRole = typeof VALID_ROLES[number];
 
@@ -94,27 +94,34 @@ export const getUsers = async (req: Request, res: Response) => {
     const { role } = req.query;
     const user = (req as AuthenticatedRequest).user;
 
+    // If role is provided, validate it
     if (role && !VALID_ROLES.includes(role as UserRole)) {
       return res.status(400).json({ 
         error: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}` 
       });
     }
 
-    let query: Query<DocumentData> = db.collection('users');
+    let queryRef: admin.firestore.Query | admin.firestore.CollectionReference = 
+      db.collection('users');
 
-    if (role === 'patient' && user?.role === 'doctor') {
-      const snapshot = await db.collection('users')
-        .where('role', '==', 'patient')
-        .where(`relationships.doctorIds`, 'array-contains', user.id)
-        .get();
-      
-      const patients = snapshot.docs.map(doc => ({
-        id: doc.id, 
-        ...doc.data()
-      }));
-      
-      return res.json(patients);
+    // If role is specified, filter by role
+    if (role) {
+      queryRef = queryRef.where('role', '==', role);
     }
+
+    const snapshot = await queryRef.get();
+    
+    // Map the documents to include ID and exclude password
+    const users = snapshot.docs.map(doc => {
+      const userData = doc.data();
+      const { password, ...userWithoutPassword } = userData;
+      return {
+        id: doc.id,
+        ...userWithoutPassword
+      };
+    });
+
+    return res.json(users);
   } catch (error) {
     console.error('Error getting users:', error);
     return res.status(500).json({ error: 'Failed to get users' });
