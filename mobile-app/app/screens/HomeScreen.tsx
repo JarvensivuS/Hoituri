@@ -6,7 +6,7 @@ interface HomeScreenProps {
   setScreen: (screen: string) => void;
 }
 
-// Esimerkkimuistutukset
+// Esimerkkimuistutukseet
 const reminders = [
   { day: "Maanantai", medicine: "Keltainen juoma", time: "09:00" },
   { day: "Tiistai", medicine: "Punainen pilleri", time: "12:00" },
