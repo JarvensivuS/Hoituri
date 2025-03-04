@@ -23,7 +23,6 @@ const reminders = [
   { day: "Maanantai", medicine: "Muisti Laastari", time: "09:05" },
   { day: "Tiistai", medicine: "Punainen pilleri", time: "12:00" },
   { day: "Keskiviikko", medicine: "Oranssi pilleri", time: "18:00" },
-  
 ];
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
@@ -53,13 +52,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
     "sunnuntai": 7,
   };
 
-  // Järjestetään muistutukset ensin viikonpäivän, sitten kellonajan mukaan
+  // Lasketaan nykyisen päivän indeksi
+  const currentDayIndex = daysOrder[weekday.toLowerCase()];
+
+  // Järjestetään muistutukset siten, että nykyisen päivän muistutukset tulevat ensin.
   const sortedReminders = reminders.slice().sort((a, b) => {
-    const dayA = daysOrder[a.day.toLowerCase()];
-    const dayB = daysOrder[b.day.toLowerCase()];
-    if (dayA !== dayB) {
-      return dayA - dayB;
+    const aIndex = daysOrder[a.day.toLowerCase()];
+    const bIndex = daysOrder[b.day.toLowerCase()];
+    // Lasketaan relatiiviset arvot nykyisestä päivästä (0 = tänään)
+    const relativeA = (aIndex - currentDayIndex + 7) % 7;
+    const relativeB = (bIndex - currentDayIndex + 7) % 7;
+    if (relativeA !== relativeB) {
+      return relativeA - relativeB;
     }
+    // Jos muistutukset ovat samalta päivältä, verrataan kellonaikoja
     return a.time.localeCompare(b.time);
   });
 
@@ -78,8 +84,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
       {/* ScrollView: muistutukset eivät työntäisi otsikkoa ylös */}
       <ScrollView style={{ width: "100%" }} contentContainerStyle={{ paddingBottom: 20 }}>
         {sortedReminders.map((item, index) => {
-          const isToday =
-            item.day.toLowerCase() === weekday.toLowerCase();
+          const isToday = item.day.toLowerCase() === weekday.toLowerCase();
           return (
             <View
               key={index}
