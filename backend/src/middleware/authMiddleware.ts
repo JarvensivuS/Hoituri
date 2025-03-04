@@ -5,6 +5,8 @@ export interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
     role: string;
+    email?: string;
+    name?: string;
     relationships?: {
       doctorIds?: string[];
       patientIds?: string[];
@@ -19,6 +21,11 @@ export const verifyUser = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (req.path === '/login' && req.method === 'POST') {
+      next();
+      return;
+    }
+
     const userId = req.headers['user-id'] as string;
     
     if (!userId) {
@@ -37,6 +44,8 @@ export const verifyUser = async (
     (req as AuthenticatedRequest).user = {
       id: userDoc.id,
       role: userData?.role,
+      email: userData?.email,
+      name: userData?.name,
       relationships: userData?.relationships
     };
 

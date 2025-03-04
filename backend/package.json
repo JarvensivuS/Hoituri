@@ -8,12 +8,14 @@
         "build": "tsc"
     },
     "dependencies": {
+        "bcrypt": "^5.1.1",
         "express": "^4.21.2",
         "firebase-admin": "^13.1.0",
         "hoituri-backend": "file:",
         "ts-node": "^10.9.1"
     },
     "devDependencies": {
+        "@types/bcrypt": "^5.0.2",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.0",
         "@types/node": "^18.19.76",
