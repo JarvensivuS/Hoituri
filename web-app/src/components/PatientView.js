@@ -1,36 +1,57 @@
-import { useState } from "react";
+// web-app/src/components/PatientView.js
+import { useState, useEffect } from "react";
+import { getPatients } from "../services/api";
 
-//TODO GET AND SET patients from and to database
-
-const PatientView = () => {
+const PatientView = ({ userId }) => {
     const [searchTerm, setSearchTerm] = useState("");
-    const [patients, setPatients] = useState([
-        "Matti Meikäläinen",
-        "Maija Mehiläinen",
-        "Kalle Kääriäinen",
-        "Testi Mies",
-        "Kalevi Keihänen",
-    ]);
+    const [patients, setPatients] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [newPatient, setNewPatient] = useState("");
 
+    useEffect(() => {
+        const fetchPatients = async () => {
+            try {
+                setLoading(true);
+                const patientsData = await getPatients(userId);
+                setPatients(patientsData);
+            } catch (err) {
+                console.error("Error fetching patients:", err);
+                setError("Potilaiden lataaminen epäonnistui");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (userId) {
+            fetchPatients();
+        }
+    }, [userId]);
+
     const filteredPatients = patients.filter((patient) =>
-        patient.toLowerCase().includes(searchTerm.toLowerCase())
+        patient.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const addPatient = () => {
+        // This would eventually call an API to add a patient
         if (newPatient.trim() !== "") {
-            setPatients([...patients, newPatient]);
+            // For now, just update local state
+            setPatients([...patients, { id: Date.now().toString(), name: newPatient }]);
             setNewPatient("");
         }
     };
 
+    if (loading) {
+        return <div>Ladataan potilaita...</div>;
+    }
+
+    if (error) {
+        return <div className="error">{error}</div>;
+    }
+
     return (
         <div className="container">
-            <div className="nav-buttons">
-                <button onClick={() => window.history.back()}>&#8592; Back</button>
-                <button onClick={() => (window.location.href = "/")}>Home</button>
-            </div>
-            <h1>Asiakkaat</h1>
+            <h2>Asiakkaat</h2>
             <div className="control">
                 <input
                     type="text"
@@ -46,11 +67,15 @@ const PatientView = () => {
                     placeholder="Etsi..."
                 />
             </div>
-            <ul className="patient-list">
-                {filteredPatients.map((patient, index) => (
-                    <li key={index}>{patient}</li>
-                ))}
-            </ul>
+            {filteredPatients.length === 0 ? (
+                <p>Ei potilaita</p>
+            ) : (
+                <ul className="patient-list">
+                    {filteredPatients.map((patient) => (
+                        <li key={patient.id}>{patient.name}</li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 };

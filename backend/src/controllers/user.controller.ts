@@ -1,6 +1,7 @@
 import { db } from '../config/firebase';
 import { Request, Response } from 'express';
 import { Query, DocumentData } from 'firebase-admin/firestore';
+import bcrypt from 'bcrypt';
 
 const VALID_ROLES = ['doctor', 'patient', 'caretaker'] as const;
 type UserRole = typeof VALID_ROLES[number];
@@ -9,6 +10,7 @@ interface UserData {
   role: UserRole;
   name: string;
   email: string;
+  password?: string;
 }
 
 const isValidEmail = (email: string): boolean => {
@@ -40,13 +42,13 @@ const validateUserData = (data: Partial<UserData>): string[] => {
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { role, name, email } = req.body;
+    const { role, name, email, password } = req.body;
 
-    if (!role || !name || !email) {
+    if (!role || !name || !email || !password) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const validationErrors = validateUserData({ role, name, email });
+    const validationErrors = validateUserData({ role, name, email, password });
     if (validationErrors.length > 0) {
       return res.status(400).json({ errors: validationErrors });
     }
@@ -59,20 +61,26 @@ export const createUser = async (req: Request, res: Response) => {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const userRef = db.collection('users').doc();
     const user = {
       role,
       name,
       email,
+      password: hashedPassword,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
 
     await userRef.set(user);
 
+    const { password: _, ...userWithoutPassword } = user;
+    
     return res.status(201).json({
       id: userRef.id,
-      ...user
+      ...userWithoutPassword
     });
   } catch (error) {
     console.error('Error creating user:', error);
@@ -139,6 +147,12 @@ export const updateUser = async (req: Request, res: Response) => {
       }
     }
 
+    // If password is being updated, hash it
+    if (updates.password) {
+      const saltRounds = 10;
+      updates.password = await bcrypt.hash(updates.password, saltRounds);
+    }
+
     const updatedData = {
       ...updates,
       updatedAt: new Date().toISOString()
@@ -147,15 +161,27 @@ export const updateUser = async (req: Request, res: Response) => {
     await userRef.update(updatedData);
 
     const updatedDoc = await userRef.get();
+    const userData = updatedDoc.data();
+    
+    // Don't return the password in the response
+    if (userData && userData.password) {
+      const { password, ...userWithoutPassword } = userData;
+      return res.json({
+        id: updatedDoc.id,
+        ...userWithoutPassword
+      });
+    }
+    
     return res.json({
       id: updatedDoc.id,
-      ...updatedDoc.data()
+      ...userData
     });
   } catch (error) {
     console.error('Error updating user:', error);
     return res.status(500).json({ error: 'Failed to update user' });
   }
 };
+
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
