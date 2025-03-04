@@ -7,12 +7,21 @@ interface InfoScreenProps {
 }
 
 const InfoScreen: React.FC<InfoScreenProps> = ({ setScreen }) => {
+  // Kovakoodatut muuttujat
+  const userName = "Erkki Esimerkki";
+  const relative = "Ulla Esimerkki";
+
   return (
     <View style={[styles.ScreenContainer, { justifyContent: "space-between", paddingVertical: 20 }]}>
-      <Text style={styles.ScreenText}>Asiakkaan tiedot tänne</Text>
+      <View>
+        <Text style={styles.ScreenText}>Asiakkaan tiedot</Text>
+        <Text></Text>
+        <Text style={styles.ScreenText}>Käyttäjä: {userName}</Text>
+        <Text style={styles.ScreenText}>Omainen: {relative}</Text>
+      </View>
       
       <TouchableOpacity style={styles.button} onPress={() => setScreen("LoginScreen")}>
-        <Text style={styles.buttonText}>Logout</Text>
+        <Text style={styles.buttonText}>Kirjaudu ulos</Text>
       </TouchableOpacity>
     </View>
   );
