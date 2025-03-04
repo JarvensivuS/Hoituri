@@ -2,6 +2,7 @@ import { db } from '../config/firebase';
 import { Request, Response } from 'express';
 import { Query, DocumentData } from 'firebase-admin/firestore';
 import bcrypt from 'bcrypt';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 const VALID_ROLES = ['doctor', 'patient', 'caretaker'] as const;
 type UserRole = typeof VALID_ROLES[number];
@@ -91,6 +92,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const { role } = req.query;
+    const user = (req as AuthenticatedRequest).user;
 
     if (role && !VALID_ROLES.includes(role as UserRole)) {
       return res.status(400).json({ 
@@ -100,17 +102,19 @@ export const getUsers = async (req: Request, res: Response) => {
 
     let query: Query<DocumentData> = db.collection('users');
 
-    if (role) {
-      query = query.where('role', '==', role);
+    if (role === 'patient' && user?.role === 'doctor') {
+      const snapshot = await db.collection('users')
+        .where('role', '==', 'patient')
+        .where(`relationships.doctorIds`, 'array-contains', user.id)
+        .get();
+      
+      const patients = snapshot.docs.map(doc => ({
+        id: doc.id, 
+        ...doc.data()
+      }));
+      
+      return res.json(patients);
     }
-
-    const snapshot = await query.get();
-    const users = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    return res.json(users);
   } catch (error) {
     console.error('Error getting users:', error);
     return res.status(500).json({ error: 'Failed to get users' });

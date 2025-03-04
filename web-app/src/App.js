@@ -1,4 +1,3 @@
-// web-app/src/App.js
 import React, { useState, useEffect } from "react";
 import MedicationSchedule from "./components/MedicationSchedule";
 import PatientView from "./components/PatientView";

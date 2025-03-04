@@ -22,6 +22,32 @@ export const loginUser = async (email, password, platform = 'web') => {
   }
 };
 
+export const managePatientCaretaker = async (doctorId, patientId, caretakerId, action) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${patientId}/relationships`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'user-id': doctorId
+      },
+      body: JSON.stringify({
+        caretakerId: caretakerId,
+        action: action // 'add' or 'remove'
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to manage caretaker');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error managing caretaker:', error);
+    throw error;
+  }
+};
+
 export const getUsers = async (doctorId) => {
   try {
     const response = await fetch(`${API_BASE_URL}/users`, {
@@ -128,6 +154,110 @@ export const deletePrescription = async (doctorId, prescriptionId) => {
     return true;
   } catch (error) {
     console.error('Error deleting prescription:', error);
+    throw error;
+  }
+};
+
+export const addCaretakerToPatient = async (userId, patientId, caretakerId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${patientId}/relationships`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'user-id': userId
+      },
+      body: JSON.stringify({
+        caretakerId: caretakerId,
+        action: 'add'
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to add caretaker to patient');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding caretaker to patient:', error);
+    throw error;
+  }
+};
+
+export const addDoctorToPatient = async (doctorId, patientId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${patientId}/relationships`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'user-id': doctorId
+      },
+      body: JSON.stringify({
+        doctorId: doctorId,
+        action: 'add'
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to add doctor to patient');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding doctor to patient:', error);
+    throw error;
+  }
+};
+
+export const removeDoctorFromPatient = async (doctorId, patientId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${patientId}/relationships`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'user-id': doctorId
+      },
+      body: JSON.stringify({
+        doctorId: doctorId,
+        action: 'remove'
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to remove doctor from patient');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error removing doctor from patient:', error);
+    throw error;
+  }
+};
+
+export const removeCaretakerFromPatient = async (userId, patientId, caretakerId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${patientId}/relationships`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'user-id': userId
+      },
+      body: JSON.stringify({
+        caretakerId: caretakerId,
+        action: 'remove'
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to remove caretaker from patient');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error removing caretaker from patient:', error);
     throw error;
   }
 };
