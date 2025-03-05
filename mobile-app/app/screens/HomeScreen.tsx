@@ -8,21 +8,21 @@ interface HomeScreenProps {
 
 // Esimerkkimuistutukseet
 const reminders = [
-  { day: "Maanantai", medicine: "Keltainen juoma", time: "09:00" },
-  { day: "Tiistai", medicine: "Punainen pilleri", time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", time: "18:00" },
-  { day: "Maanantai", medicine: "jalka voide", time: "01:00" },
-  { day: "Tiistai", medicine: "Punainen pilleri", time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", time: "18:00" },
-  { day: "Maanantai", medicine: "burana", time: "08:00" },
-  { day: "Tiistai", medicine: "Punainen pilleri", time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", time: "18:00" },
-  { day: "Maanantai", medicine: "UniPro unilääke", time: "22:00" },
-  { day: "Tiistai", medicine: "Punainen pilleri", time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", time: "18:00" },
-  { day: "Maanantai", medicine: "Muisti Laastari", time: "09:05" },
-  { day: "Tiistai", medicine: "Punainen pilleri", time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", time: "18:00" },
+  { day: "Maanantai", medicine: "Keltainen juoma", dosage:1, time: "09:00" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "18:00" },
+  { day: "Maanantai", medicine: "jalka voide", dosage:1, time: "01:00" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "18:00" },
+  { day: "Maanantai", medicine: "burana", dosage:2, time: "08:00" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "12:00" },
+  { day: "Maanantai", medicine: "UniPro unilääke", dosage:7, time: "22:00" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "18:00" },
+  { day: "Maanantai", medicine: "Muisti Laastari", dosage:1, time: "09:05" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "18:00" },
 ];
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
@@ -100,6 +100,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
             >
               <Text>Päivä: {item.day}</Text>
               <Text>Lääke: {item.medicine}</Text>
+              <Text>Annos: {item.dosage}</Text>
               <Text>Aika: {item.time}</Text>
             </View>
           );
