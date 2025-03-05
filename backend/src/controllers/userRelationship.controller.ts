@@ -2,13 +2,9 @@ import { Request, Response } from 'express';
 import { db } from '../config/firebase';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
-/**
- * Update user relationships
- * This handler manages doctor-patient and caretaker-patient relationships
- */
 export const updateUserRelationships = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId } = req.params; // The user being modified
+    const { userId } = req.params; 
     const { doctorId, caretakerId, action } = req.body;
     const requestingUser = (req as AuthenticatedRequest).user;
 
@@ -28,14 +24,11 @@ export const updateUserRelationships = async (req: Request, res: Response): Prom
       return;
     }
 
-    // Get the user data to update
     const userData = userDoc.data();
     let userRelationships = userData?.relationships || {};
     let isAuthorized = false;
 
-    // Handle doctor-patient relationship
     if (doctorId) {
-      // Authorization check: Doctors can add themselves to patients or remove themselves
       if (requestingUser.role === 'doctor' && requestingUser.id === doctorId) {
         isAuthorized = true;
       }
@@ -45,17 +38,18 @@ export const updateUserRelationships = async (req: Request, res: Response): Prom
         return;
       }
 
-      // Process the action
       if (action === 'add') {
-        // Add doctor to patient
         if (!userRelationships.doctorIds) {
           userRelationships.doctorIds = [];
         }
         if (!userRelationships.doctorIds.includes(doctorId)) {
           userRelationships.doctorIds.push(doctorId);
         }
+        
+        if ('doctorId' in userRelationships) {
+          delete userRelationships.doctorId;
+        }
 
-        // Also update doctor's patient list
         const doctorDoc = await db.collection('users').doc(doctorId).get();
         if (doctorDoc.exists) {
           const doctorData = doctorDoc.data();
@@ -73,14 +67,12 @@ export const updateUserRelationships = async (req: Request, res: Response): Prom
           });
         }
       } else if (action === 'remove') {
-        // Remove doctor from patient
         if (userRelationships.doctorIds) {
           userRelationships.doctorIds = userRelationships.doctorIds.filter(
             (id: string) => id !== doctorId
           );
         }
 
-        // Also update doctor's patient list
         const doctorDoc = await db.collection('users').doc(doctorId).get();
         if (doctorDoc.exists) {
           const doctorData = doctorDoc.data();
@@ -99,11 +91,8 @@ export const updateUserRelationships = async (req: Request, res: Response): Prom
       }
     }
     
-    // Handle caretaker-patient relationship
     else if (caretakerId) {
-      // Authorization check: Doctors can add caretakers to their patients
       if (requestingUser.role === 'doctor') {
-        // Check if the doctor is assigned to this patient
         const patientDoctorIds = userData?.relationships?.doctorIds || [];
         if (patientDoctorIds.includes(requestingUser.id)) {
           isAuthorized = true;
@@ -115,12 +104,9 @@ export const updateUserRelationships = async (req: Request, res: Response): Prom
         return;
       }
 
-      // Process the action
       if (action === 'add') {
-        // Add caretaker to patient
         userRelationships.caretakerId = caretakerId;
 
-        // Also update caretaker's patient list
         const caretakerDoc = await db.collection('users').doc(caretakerId).get();
         if (caretakerDoc.exists) {
           const caretakerData = caretakerDoc.data();
@@ -138,12 +124,10 @@ export const updateUserRelationships = async (req: Request, res: Response): Prom
           });
         }
       } else if (action === 'remove') {
-        // Remove caretaker from patient
         if (userRelationships.caretakerId === caretakerId) {
           delete userRelationships.caretakerId;
         }
 
-        // Also update caretaker's patient list
         const caretakerDoc = await db.collection('users').doc(caretakerId).get();
         if (caretakerDoc.exists) {
           const caretakerData = caretakerDoc.data();
@@ -162,19 +146,16 @@ export const updateUserRelationships = async (req: Request, res: Response): Prom
       }
     }
 
-    // If neither doctorId nor caretakerId is provided, return error
     else {
       res.status(400).json({ error: 'Either doctorId or caretakerId must be provided' });
       return;
     }
 
-    // Check if the user is authorized to make this change
     if (!isAuthorized) {
       res.status(403).json({ error: 'Forbidden - Not authorized to update this relationship' });
       return;
     }
 
-    // Update the user's relationships
     await db.collection('users').doc(userId).update({
       relationships: userRelationships,
       updatedAt: new Date().toISOString()
