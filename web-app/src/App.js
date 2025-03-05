@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import MedicationSchedule from "./components/MedicationSchedule";
 import PatientView from "./components/PatientView";
 import Login from "./components/Login";
+import "./styles.css";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -55,7 +56,9 @@ function App() {
             <h1>Hoituri - Lääkärin näkymä</h1>
             <div className="user-info">
               <span>Kirjautunut: {user.name}</span>
-              <button onClick={handleLogout} className="logout-btn">Kirjaudu ulos</button>
+              <button
+                onClick={handleLogout}
+                className="logout-btn">Kirjaudu ulos</button>
             </div>
           </div>
           <div className="content-placeholder">

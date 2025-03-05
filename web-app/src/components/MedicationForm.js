@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getPatients } from "../services/api";
 import { handleAddReminder, formatTimeString } from "../utils/medicationHandlers";
+import "../styles.css";
 
 const MedicationForm = ({ userId, onAddSuccess }) => {
   const [patients, setPatients] = useState([]);
@@ -114,17 +115,16 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
   };
 
   return (
-    <div style={{ marginBottom: "20px", padding: "15px", border: "1px solid #eee", borderRadius: "5px" }}>
+    <div className="medication-form">
       <h3>Lisää uusi lääke</h3>
-      
-      {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
-      
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>Potilas:</label>
+
+      {error && <div className="error-message">{error}</div>}
+
+      <div className="form-group">
+        <label>Potilas:</label>
         <select
           value={selectedPatient}
           onChange={(e) => setSelectedPatient(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
           disabled={patients.length === 0 || loading}
         >
           {patients.length === 0 ? (
@@ -138,37 +138,34 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
           )}
         </select>
       </div>
-      
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>Lääke:</label>
+
+      <div className="form-group">
+        <label>Lääke:</label>
         <input
           type="text"
           placeholder="Lääkkeen nimi"
           value={newMedicine}
           onChange={(e) => setNewMedicine(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
           disabled={loading}
         />
       </div>
-      
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>Annostus:</label>
+
+      <div className="form-group">
+        <label>Annostus:</label>
         <input
           type="text"
           placeholder="esim. 1 tabletti"
           value={dosage}
           onChange={(e) => setDosage(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
           disabled={loading}
         />
       </div>
-      
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>Päivä:</label>
+
+      <div className="form-group">
+        <label>Päivä:</label>
         <select
           value={newDay}
           onChange={(e) => setNewDay(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
           disabled={loading}
         >
           {weekdays.map((day, index) => (
@@ -179,44 +176,33 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
           <option value="Joka päivä">Joka päivä</option>
         </select>
       </div>
-      
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>Aika:</label>
+
+      <div className="form-group">
+        <label>Aika:</label>
         <input
           type="text"
           value={newTime}
           onChange={handleTimeChange}
           placeholder="00:00"
           maxLength={5}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
           disabled={loading}
         />
       </div>
-      
-      <div style={{ marginBottom: "15px", textAlign: "left" }}>
-        <label style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+
+      <div className="form-group checkbox-group">
+        <label>
           <input
             type="checkbox"
             checked={notifyCaretaker}
             onChange={(e) => setNotifyCaretaker(e.target.checked)}
-            style={{ marginRight: "10px" }}
             disabled={loading}
           />
-          <span>Jaa tieto hoitajalle (potilaan luvalla)</span>
+          Jaa tieto hoitajalle (potilaan luvalla)
         </label>
       </div>
-      
-      <button 
-        onClick={addReminder} 
-        style={{ 
-          padding: "10px 20px", 
-          backgroundColor: "#007bff", 
-          color: "white", 
-          border: "none", 
-          borderRadius: "4px", 
-          cursor: "pointer",
-          width: "100%"
-        }}
+
+      <button
+        onClick={addReminder}
         disabled={loading || !selectedPatient || patients.length === 0}
       >
         {loading ? "Lisätään..." : "Lisää lääkemuistutus"}
