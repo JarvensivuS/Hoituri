@@ -94,7 +94,6 @@ export const getUsers = async (req: Request, res: Response) => {
     const { role } = req.query;
     const user = (req as AuthenticatedRequest).user;
 
-    // If role is provided, validate it
     if (role && !VALID_ROLES.includes(role as UserRole)) {
       return res.status(400).json({ 
         error: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}` 
@@ -104,14 +103,12 @@ export const getUsers = async (req: Request, res: Response) => {
     let queryRef: admin.firestore.Query | admin.firestore.CollectionReference = 
       db.collection('users');
 
-    // If role is specified, filter by role
     if (role) {
       queryRef = queryRef.where('role', '==', role);
     }
 
     const snapshot = await queryRef.get();
     
-    // Map the documents to include ID and exclude password
     const users = snapshot.docs.map(doc => {
       const userData = doc.data();
       const { password, ...userWithoutPassword } = userData;
@@ -158,7 +155,6 @@ export const updateUser = async (req: Request, res: Response) => {
       }
     }
 
-    // If password is being updated, hash it
     if (updates.password) {
       const saltRounds = 10;
       updates.password = await bcrypt.hash(updates.password, saltRounds);
@@ -174,7 +170,6 @@ export const updateUser = async (req: Request, res: Response) => {
     const updatedDoc = await userRef.get();
     const userData = updatedDoc.data();
     
-    // Don't return the password in the response
     if (userData && userData.password) {
       const { password, ...userWithoutPassword } = userData;
       return res.json({

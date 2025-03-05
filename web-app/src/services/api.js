@@ -158,13 +158,13 @@ export const deletePrescription = async (doctorId, prescriptionId) => {
   }
 };
 
-export const addCaretakerToPatient = async (userId, patientId, caretakerId) => {
+export const addCaretakerToPatient = async (doctorId, patientId, caretakerId) => {
   try {
     const response = await fetch(`${API_BASE_URL}/users/${patientId}/relationships`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'user-id': userId
+        'user-id': doctorId
       },
       body: JSON.stringify({
         caretakerId: caretakerId,
@@ -232,6 +232,57 @@ export const removeDoctorFromPatient = async (doctorId, patientId) => {
     return await response.json();
   } catch (error) {
     console.error('Error removing doctor from patient:', error);
+    throw error;
+  }
+};
+
+// api.js - Updated to include password field
+export const createUser = async (creatorId, userData) => {
+  try {
+    // Validate required fields according to the actual backend implementation
+    if (!userData.role || !userData.name || !userData.email || !userData.password) {
+      throw new Error('Missing required fields: role, name, email, and password are required');
+    }
+    
+    // Log the request for debugging
+    console.log('Creating user with data:', {
+      ...userData,
+      password: '[REDACTED]' // Don't log actual password
+    });
+    
+    const response = await fetch(`${API_BASE_URL}/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'user-id': creatorId
+      },
+      body: JSON.stringify({
+        role: userData.role,
+        name: userData.name,
+        email: userData.email,
+        password: userData.password
+      }),
+    });
+    
+    // Get the response data
+    let responseData;
+    try {
+      responseData = await response.json();
+    } catch (error) {
+      console.error('Failed to parse response', error);
+      throw new Error('Invalid response from server');
+    }
+    
+    console.log('API response status:', response.status);
+    console.log('API response data:', responseData);
+    
+    if (!response.ok) {
+      throw new Error(responseData.error || responseData.errors?.join(', ') || 'Failed to create user');
+    }
+    
+    return responseData;
+  } catch (error) {
+    console.error('Error creating user:', error);
     throw error;
   }
 };
