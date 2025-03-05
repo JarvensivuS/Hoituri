@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { SafeAreaView, StatusBar, View, TouchableOpacity, Text } from "react-native";
 import HomeScreen from "./screens/HomeScreen";
 import LocationScreen from "./screens/LocationScreen";
-import InfoScreen from "./screens/InfoScreen";
 import LoginScreen from "./screens/LoginScreen";
 import LocationTracker from "./components/LocationTracker";
 import { HomeProvider } from "./components/HomeContext";
@@ -20,16 +19,16 @@ const App = () => {
             barStyle="light-content"
             backgroundColor={styles.statusBar.backgroundColor}
           />
-          
+
           {/* Näytetään yläpalkki vain, jos käyttäjä ei ole kirjautumassa */}
           {screen !== "LoginScreen" && (
             <View style={styles.topNav}>
-              {/* Vasemman reunan navigointi */}
+              {/* Vasemman reunan navigointi: "Kirjaudu ulos" -nappi Home-näkymässä */}
               <TouchableOpacity
-                onPress={() => setScreen("InfoScreen")}
+                onPress={() => setScreen("LoginScreen")}
                 style={[styles.backButton, { display: screen === "Home" ? "flex" : "none" }]}
               >
-                <Text style={styles.navText}>← Info</Text>
+                <Text style={styles.navText}>Kirjaudu ulos</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setScreen("Home")}
@@ -44,8 +43,6 @@ const App = () => {
                   ? "Aloitus" 
                   : screen === "LocationScreen" 
                   ? "Sijainti" 
-                  : screen === "InfoScreen"
-                  ? "Info"
                   : "Kirjautuminen"}
               </Text>
   
@@ -56,12 +53,6 @@ const App = () => {
               >
                 <Text style={styles.navText}>Sijainti →</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setScreen("Home")}
-                style={[styles.forwardButton, { display: screen === "InfoScreen" ? "flex" : "none" }]}
-              >
-                <Text style={styles.navText}>Aloitus →</Text>
-              </TouchableOpacity>
             </View>
           )}
 
@@ -69,7 +60,6 @@ const App = () => {
           <View style={styles.screenContent}>
             {screen === "Home" && <HomeScreen setScreen={setScreen} />}
             {screen === "LocationScreen" && <LocationScreen setScreen={setScreen} />}
-            {screen === "InfoScreen" && <InfoScreen setScreen={setScreen} />}
             {screen === "LoginScreen" && <LoginScreen setScreen={setScreen} />}
           </View>
         </SafeAreaView>
