@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MedicationSchedule from "./components/MedicationSchedule";
 import PatientView from "./components/PatientView";
-import AlertsNotifications from "./components/AlertsNotifications";
-import LocationTracking from "./components/LocationTracking";
 import Login from "./components/Login";
 
 function App() {
@@ -62,9 +60,7 @@ function App() {
           </div>
           <div className="content-placeholder">
             <div className="card"><PatientView userId={user.id} /></div>
-            <div className="card"><LocationTracking userId={user.id} /></div>
             <div className="card"><MedicationSchedule userId={user.id} /></div>
-            <div className="card"><AlertsNotifications userId={user.id} /></div>
           </div>
         </>
       )}

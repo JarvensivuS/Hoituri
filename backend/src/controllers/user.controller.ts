@@ -1,6 +1,5 @@
 import { db } from '../config/firebase';
 import { Request, Response } from 'express';
-import { Query, DocumentData } from 'firebase-admin/firestore';
 import bcrypt from 'bcrypt';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import admin from 'firebase-admin';
