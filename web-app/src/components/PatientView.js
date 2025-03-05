@@ -13,6 +13,7 @@ import AddDoctorModal from './modals/AddDoctorModal';
 import CaretakerModal from './modals/CaretakerModal';
 import PatientCreateModal from './modals/PatientCreateModal';
 import CaretakerCreateModal from './modals/CaretakerCreateModal';
+import "../styles.css";
 
 const PatientView = ({ userId }) => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -363,16 +364,9 @@ const PatientView = ({ userId }) => {
             <h2>Potilaat</h2>
             <div className="control" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
                 <div>
-                    <button 
+                    <button
+                        className="add-btn" 
                         onClick={openAddPatientModal}
-                        style={{
-                            marginRight: '10px',
-                            backgroundColor: '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            padding: '8px 16px'
-                        }}
                         disabled={actionLoading}
                     >
                         Lisää uusi potilas
@@ -501,7 +495,8 @@ const PatientView = ({ userId }) => {
                                                     color: 'white',
                                                     border: 'none',
                                                     borderRadius: '4px',
-                                                    padding: '5px 10px'
+                                                    padding: '5px 10px',
+                                                    minWidth: '120px'
                                                 }}
                                                 disabled={actionLoading || caretakers.length === 0}
                                             >

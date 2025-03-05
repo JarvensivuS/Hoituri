@@ -1,4 +1,5 @@
 import { handleDeletePrescription } from "../utils/medicationHandlers";
+import "../styles.css"
 
 const MedicationItem = ({ prescription, userId, onDelete }) => {
   const handleDelete = async () => {
@@ -26,14 +27,7 @@ const MedicationItem = ({ prescription, userId, onDelete }) => {
       <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
         <button 
           onClick={handleDelete}
-          style={{
-            backgroundColor: "#dc3545",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            padding: "5px 10px",
-            cursor: "pointer"
-          }}
+          className="delete-btn"
         >
           Poista
         </button>
