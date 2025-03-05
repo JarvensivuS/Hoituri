@@ -1,32 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
-import styles from "../styles"; // 🔹 Importing styles
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import styles from "../styles";
 
 interface HomeScreenProps {
   setScreen: (screen: string) => void;
 }
 
-// Esimerkkimuistutukseet
+// Esimerkkimuistutukset
 const reminders = [
-  { day: "Maanantai", medicine: "Keltainen juoma", dosage:1, time: "09:00" },
-  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "18:00" },
-  { day: "Maanantai", medicine: "jalka voide", dosage:1, time: "01:00" },
-  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "18:00" },
-  { day: "Maanantai", medicine: "burana", dosage:2, time: "08:00" },
-  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "12:00" },
-  { day: "Maanantai", medicine: "UniPro unilääke", dosage:7, time: "22:00" },
-  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "18:00" },
-  { day: "Maanantai", medicine: "Muisti Laastari", dosage:1, time: "09:05" },
-  { day: "Tiistai", medicine: "Punainen pilleri", dosage:2, time: "12:00" },
-  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage:2, time: "18:00" },
+  { day: "Maanantai", medicine: "Keltainen juoma", dosage: 1, time: "09:00" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage: 2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage: 2, time: "18:00" },
+  { day: "Maanantai", medicine: "jalka voide", dosage: 1, time: "01:00" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage: 2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage: 2, time: "18:00" },
+  { day: "Maanantai", medicine: "burana", dosage: 2, time: "08:00" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage: 2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage: 2, time: "12:00" },
+  { day: "Maanantai", medicine: "UniPro unilääke", dosage: 7, time: "22:00" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage: 2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage: 2, time: "18:00" },
+  { day: "Maanantai", medicine: "Muisti Laastari", dosage: 1, time: "09:05" },
+  { day: "Tiistai", medicine: "Punainen pilleri", dosage: 2, time: "12:00" },
+  { day: "Keskiviikko", medicine: "Oranssi pilleri", dosage: 2, time: "18:00" },
 ];
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [emergencyPressed, setEmergencyPressed] = useState(false);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -40,6 +41,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
   const weekday = currentDateTime.toLocaleDateString("fi-FI", { weekday: "long" });
   const date = currentDateTime.toLocaleDateString("fi-FI", { day: "numeric", month: "long", year: "numeric" });
   const time = currentDateTime.toLocaleTimeString("fi-FI");
+
+  const patientName = "Matti Meikäläinen"; // Asiakkaan nimi
 
   // Määritellään viikonpäivien järjestys
   const daysOrder: { [key: string]: number } = {
@@ -73,16 +76,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
     <View style={styles.ScreenContainer}>
       {/* Yläosan reaaliaikaiset tiedot */}
       <View style={{ alignItems: "center", marginBottom: 20 }}>
-        <Text style={{ fontSize: 30, fontWeight: "bold" }}>Tänään on {weekday}</Text>
-        <Text style={{ fontSize: 20 }}>{date}</Text>
-        <Text style={{ fontSize: 20 }}>{time}</Text>
+        <Text style={styles.ScreenText}>Käyttäjä: {patientName}</Text>
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>Tänään on {weekday}</Text>
+        <Text style={{ fontSize: 16 }}>{date}</Text>
+        <Text style={{ fontSize: 16 }}>{time}</Text>
       </View>
 
-      {/* Otsikko Lääkemuistutuksille */}
-      <Text style={styles.ScreenText}>Lääkemuistutukset</Text>
-
-      {/* ScrollView: muistutukset eivät työntäisi otsikkoa ylös */}
-      <ScrollView style={{ width: "100%" }} contentContainerStyle={{ paddingBottom: 20 }}>
+      {/* Lääkemuistutukset - ScrollView säilyy keskellä */}
+      <ScrollView
+        style={{ width: "100%" }}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
         {sortedReminders.map((item, index) => {
           const isToday = item.day.toLowerCase() === weekday.toLowerCase();
           return (
@@ -91,8 +95,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
               style={{
                 borderWidth: 1,
                 borderColor: "#ccc",
-                padding: 10,
-                marginVertical: 5,
+                padding: 2,
+                marginVertical: 2,
                 borderRadius: 5,
                 width: "100%",
                 backgroundColor: isToday ? "#e0f7fa" : "transparent",
@@ -106,6 +110,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
           );
         })}
       </ScrollView>
+
+      {/* HÄTÄ-nappi lisätty HomeScreenin alaosaan */}
+      <View style={{ alignItems: "center", marginVertical: 20 }}>
+        <TouchableOpacity
+          onPress={() => setEmergencyPressed((prev) => !prev)}
+          style={{
+            width: 100,
+            height: 100,
+            borderRadius: 99,
+            backgroundColor: "red",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ color: "white", fontWeight: "bold", fontSize: 34 }}>HÄTÄ</Text>
+        </TouchableOpacity>
+        <Text style={{ fontSize: 18, marginTop: 10 }}>
+          {emergencyPressed ? "true" : "false"}
+        </Text>
+      </View>
     </View>
   );
 };
