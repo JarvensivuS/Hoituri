@@ -29,31 +29,48 @@ export const createPrescription: RequestHandler = async (req: Request, res: Resp
 };
 
 export const getPrescriptions: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { doctorId, patientId } = req.query;
-      const prescriptionsCollection = db.collection('prescriptions');
-      
-      let query: CollectionReference | Query = prescriptionsCollection;
-  
-      if (doctorId) {
-        query = prescriptionsCollection.where('doctorId', '==', doctorId);
-      }
-      if (patientId) {
-        query = query.where('patientId', '==', patientId);
-      }
-  
-      const snapshot = await query.get();
-      const prescriptions = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-  
-      res.json(prescriptions);
-    } catch (error) {
-      console.error('Error getting prescriptions:', error);
-      res.status(500).json({ error: 'Failed to get prescriptions' });
+  try {
+    const { doctorId, patientId } = req.query;
+    const prescriptionsCollection = db.collection('prescriptions');
+    
+    let query: CollectionReference | Query = prescriptionsCollection;
+
+    if (doctorId) {
+      query = prescriptionsCollection.where('doctorId', '==', doctorId);
     }
-  };
+    if (patientId) {
+      query = query.where('patientId', '==', patientId);
+    }
+
+    const snapshot = await query.get();
+    const prescriptions = [];
+    
+    for (const doc of snapshot.docs) {
+      const prescriptionData = doc.data();
+      
+      let patientName = "Tuntematon";
+      try {
+        const patientDoc = await db.collection('users').doc(prescriptionData.patientId).get();
+        if (patientDoc.exists) {
+          patientName = patientDoc.data()?.name;
+        }
+      } catch (error) {
+        console.error('Error fetching patient name:', error);
+      }
+      
+      prescriptions.push({
+        id: doc.id,
+        ...prescriptionData,
+        patientName
+      });
+    }
+
+    res.json(prescriptions);
+  } catch (error) {
+    console.error('Error getting prescriptions:', error);
+    res.status(500).json({ error: 'Failed to get prescriptions' });
+  }
+};
 
 export const getPrescriptionById: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   try {

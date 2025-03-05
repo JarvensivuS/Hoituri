@@ -1,142 +1,104 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import { getPrescriptions } from "../services/api";
+import MedicationForm from "./MedicationForm";
+import MedicationList from "./MedicationList";
 
-//TODO GET AND SET medications from and to database
+const MedicationSchedule = ({ userId }) => {
+  const [reminders, setReminders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const MedicationSchedule = () => {
-  const [reminder, setReminder] = useState([]);
-  const [newMedicine, setNewMedicine] = useState("");
-  const [newTime, setNewTime] = useState("");
-  const [newDay, setNewDay] = useState("Maanantai");
-
-  // Weekdays for drop menu
-  const weekdays = [
-    "Maanantai",
-    "Tiistai",
-    "Keskiviikko",
-    "Torstai",
-    "Perjantai",
-    "Lauantai",
-    "Sunnuntai",
-  ];
-
-  // FUnction to add reminder
-  const addReminder = () => {
-    // Check that the fields aren't empty
-    if (
-      newMedicine.trim() === "" ||
-      newTime.trim() === "" ||
-      newDay.trim() === ""
-    )
-      return;
-
-    // Add new reminder to list
-    setReminder((prev) => [
-      ...prev,
-      { medicine: newMedicine, time: newTime, day: newDay },
-    ]);
-
-    // Empty all input fields
-    setNewMedicine("");
-    setNewTime("");
-    setNewDay("Maanantai"); //Monday as a starting point
+  const fetchReminders = async () => {
+    try {
+      setLoading(true);
+      // Fetch prescriptions where the logged-in doctor is the doctor
+      const prescriptionsData = await getPrescriptions(userId, { doctorId: userId });
+      
+      // Transform data for the component
+      const remindersList = prescriptionsData.map(prescription => {
+        return {
+          id: prescription.id,
+          medicine: prescription.medication,
+          patientId: prescription.patientId,
+          patientName: prescription.patientName || "Tuntematon", // This may need to be fetched separately
+          dosage: prescription.dosage,
+          day: getDayFromFrequency(prescription.frequency),
+          time: prescription.reminderSettings?.times[0] || "08:00",
+          frequency: prescription.frequency,
+          notifyCaretaker: prescription.reminderSettings?.notifyCaretaker || false
+        };
+      });
+      
+      setReminders(remindersList);
+    } catch (err) {
+      console.error("Failed to load prescriptions:", err);
+      setError("Lääkemuistutuksien lataaminen epäonnistui");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleTimeChange = (e) => {
-    let time = e.target.value;
-  
-    // Allow only numbers
-    if (!/^\d{0,2}:?\d{0,2}$/.test(time)) {
-      return;
+  useEffect(() => {
+    if (userId) {
+      fetchReminders();
     }
-  
-    // Automatically add : to time
-    if (time.length === 2 && !time.includes(":")) {
-      time = time + ":";
+  }, [userId]);
+
+  // Helper function to extract day from frequency
+  const getDayFromFrequency = (frequency) => {
+    // Simple implementation - in a real app, you'd have more complex logic
+    if (frequency.includes("kertaa päivässä")) {
+      return "Joka päivä";
     }
-  
-    // Time split hh:MM
-    const timeParts = time.split(":");
-  
-    if (timeParts.length === 2) {
-      let hours = parseInt(timeParts[0], 10);
-      let minutes = parseInt(timeParts[1], 10);
-  
-      // Hours not over 23 and minutes not over 59
-      if ((timeParts[0] && (isNaN(hours) || hours > 23)) || 
-          (timeParts[1] && (isNaN(minutes) || minutes > 59))) {
-        return;
+    
+    const dayMap = {
+      "maanantai": "Maanantai",
+      "tiistai": "Tiistai",
+      "keskiviikko": "Keskiviikko",
+      "torstai": "Torstai",
+      "perjantai": "Perjantai",
+      "lauantai": "Lauantai",
+      "sunnuntai": "Sunnuntai"
+    };
+    
+    for (const [key, value] of Object.entries(dayMap)) {
+      if (frequency.toLowerCase().includes(key)) {
+        return value;
       }
     }
-  
-    setNewTime(time);
+    
+    return "Maanantai";
   };
-  
+
+  const handlePrescriptionDeleted = (prescriptionId) => {
+    setReminders(reminders.filter(reminder => reminder.id !== prescriptionId));
+  };
+
+  if (loading && reminders.length === 0) {
+    return <div style={{textAlign: "center", padding: "20px"}}>Ladataan lääkemuistutuksia...</div>;
+  }
+
+  if (error) {
+    return <div style={{textAlign: "center", padding: "20px", color: "red"}}>{error}</div>;
+  }
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
       <div>
         <h2>Lääkemuistutukset</h2>
 
-        {/* Input for medicine */}
-        <div style={{ marginBottom: "20px" }}>
-          <input
-            type="text"
-            placeholder="Lisää lääke"
-            value={newMedicine}
-            onChange={(e) => setNewMedicine(e.target.value)}
-            style={{ margin: "5px", padding: "5px" }}
-          />
-          <input
-            type="text"
-            value={newTime}
-            onChange={handleTimeChange}
-            placeholder="00:00"
-            maxLength={5}
-            style={{ margin: "5px", padding: "5px" }}
-          />
-          <select
-            value={newDay}
-            onChange={(e) => setNewDay(e.target.value)}
-            style={{ margin: "5px", padding: "5px" }}
-          >
-            {/*list of weekdays*/}
-            {weekdays.map((day, index) => (
-              <option key={index} value={day}>
-                {day}
-              </option>
-            ))}
-          </select>
-          <button onClick={addReminder} style={{ padding: "5px 10px" }}>
-            Lisää
-          </button>
-        </div>
-      </div>
+        {/* Form for adding new prescriptions */}
+        <MedicationForm 
+          userId={userId} 
+          onAddSuccess={fetchReminders} 
+        />
 
-      {/* Show existing reminders */}
-      <div>
-        <h3>Muistutukset:</h3>
-        {reminder.length > 0 ? (
-          <ul style={{ padding: 0, listStyle: "none" }}>
-            {reminder.map((item, idreminder) => (
-              <li
-                key={idreminder}
-                style={{
-                  background: "#dff0d8",
-                  padding: "10px",
-                  margin: "5px 0",
-                  borderRadius: "5px",
-                }}
-              >
-                {/* Reminder info day,medicine and time */}
-                <span>
-                  Päivä: {item.day}, Lääke: {item.medicine}, Aika: {item.time}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Ei muistutuksia</p>
-        )}
+        {/* List of existing prescriptions */}
+        <MedicationList 
+          reminders={reminders} 
+          userId={userId}
+          onDeletePrescription={handlePrescriptionDeleted}
+        />
       </div>
     </div>
   );

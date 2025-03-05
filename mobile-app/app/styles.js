@@ -93,8 +93,40 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 20,
     fontWeight: "bold",
-    textAlign: "center", marginBottom: 5
- },
+    textAlign: "center",
+    marginBottom: 5,
+  },
+
+  // Uudet tyylit: container ja input
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  input: {
+    width: "80%",
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    marginVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  button: {
+    backgroundColor: "#6200EE",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 export default styles;
