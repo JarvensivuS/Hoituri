@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { 
   getPatients, 
   getUsers, 
@@ -8,20 +8,13 @@ import {
   addDoctorToPatient,
   createUser
 } from "../services/api";
-
-// Import button components
-import AddDoctorButton from './ui/AddDoctorButton';
-import AddCaretakerButton from './ui/AddCaretakerButton';
 import RemoveButton from './ui/RemoveButton';
-
-// Import modal components
 import AddDoctorModal from './modals/AddDoctorModal';
 import CaretakerModal from './modals/CaretakerModal';
 import PatientCreateModal from './modals/PatientCreateModal';
 import CaretakerCreateModal from './modals/CaretakerCreateModal';
 
 const PatientView = ({ userId }) => {
-    // State for data
     const [searchTerm, setSearchTerm] = useState("");
     const [patients, setPatients] = useState([]);
     const [caretakers, setCaretakers] = useState([]);
@@ -30,30 +23,25 @@ const PatientView = ({ userId }) => {
     const [actionLoading, setActionLoading] = useState(false);
     const [error, setError] = useState(null);
     
-    // State for patient creation
     const [showAddPatientModal, setShowAddPatientModal] = useState(false);
     const [newPatientName, setNewPatientName] = useState("");
     const [newPatientEmail, setNewPatientEmail] = useState("");
     
-    // State for caretaker creation
     const [showAddCaretakerModal, setShowAddCaretakerModal] = useState(false);
     const [newCaretakerName, setNewCaretakerName] = useState("");
     const [newCaretakerEmail, setNewCaretakerEmail] = useState("");
     
-    // State for doctor/caretaker selection modals
     const [showDoctorModal, setShowDoctorModal] = useState(false);
     const [showCaretakerSelectionModal, setShowCaretakerSelectionModal] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [selectedDoctor, setSelectedDoctor] = useState("");
     const [selectedCaretaker, setSelectedCaretaker] = useState("");
 
-    // Fetch data when component mounts
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
                 
-                // Fetch all data in parallel
                 const [patientsData, allUsers] = await Promise.all([
                     getPatients(userId),
                     getUsers(userId)
@@ -61,7 +49,6 @@ const PatientView = ({ userId }) => {
                 
                 setPatients(patientsData);
                 
-                // Filter users by role
                 const caretakersData = allUsers.filter(user => user.role === 'caretaker');
                 setCaretakers(caretakersData);
                 
@@ -80,19 +67,16 @@ const PatientView = ({ userId }) => {
         }
     }, [userId]);
 
-    // Filter patients based on search term
     const filteredPatients = patients.filter((patient) =>
         patient.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // PATIENT CREATION FUNCTIONS
     const openAddPatientModal = () => {
         setNewPatientName("");
         setNewPatientEmail("");
         setShowAddPatientModal(true);
     };
 
-    // Patient creation handler
     const handleCreatePatient = async (password = "Patient123") => {
         if (!newPatientName || !newPatientEmail) {
           alert("Potilaan nimi ja sähköposti ovat pakollisia kenttiä");
@@ -102,7 +86,6 @@ const PatientView = ({ userId }) => {
         try {
         setActionLoading(true);
         
-        // Step 1: Create the patient
         const patientData = {
             role: "patient",
             name: newPatientName,
@@ -119,12 +102,10 @@ const PatientView = ({ userId }) => {
         
         console.log("Patient created successfully:", newPatientResponse);
         
-        // Step 2: Add the current doctor to the patient's relationships
         if (newPatientResponse && newPatientResponse.id) {
             try {
             await addDoctorToPatient(userId, newPatientResponse.id);
             
-            // Update the local patients list
             const updatedPatient = {
                 ...newPatientResponse,
                 relationships: {
@@ -149,7 +130,6 @@ const PatientView = ({ userId }) => {
         }
     };
       
-      // Caretaker creation handler
     const handleCreateCaretaker = async () => {
         if (!newCaretakerName || !newCaretakerEmail) {
         alert("Hoitajan nimi ja sähköposti ovat pakollisia kenttiä");
@@ -159,12 +139,11 @@ const PatientView = ({ userId }) => {
         try {
         setActionLoading(true);
         
-        // Create the caretaker
         const caretakerData = {
             role: "caretaker",
             name: newCaretakerName,
             email: newCaretakerEmail,
-            password: "password123" // Default password, should be changed later
+            password: "password123"
         };
         
         console.log("Creating caretaker with data:", {
@@ -176,7 +155,6 @@ const PatientView = ({ userId }) => {
         
         console.log("Caretaker created successfully:", newCaretakerResponse);
         
-        // Update caretakers list
         setCaretakers([...caretakers, newCaretakerResponse]);
         setShowAddCaretakerModal(false);
         
@@ -189,18 +167,15 @@ const PatientView = ({ userId }) => {
         }
     };
 
-    // CARETAKER CREATION FUNCTIONS
     const openAddCaretakerModal = () => {
         setNewCaretakerName("");
         setNewCaretakerEmail("");
         setShowAddCaretakerModal(true);
     };
 
-    // DOCTOR MANAGEMENT FUNCTIONS
     const openDoctorModal = (patient) => {
         setSelectedPatient(patient);
         
-        // Get doctors that are not already assigned to this patient
         const patientDoctorIds = patient.relationships?.doctorIds || [];
         const availableDoctors = doctors.filter(doctor => 
             !patientDoctorIds.includes(doctor.id)
@@ -223,7 +198,6 @@ const PatientView = ({ userId }) => {
             setActionLoading(true);
             await addDoctorToPatient(selectedDoctor, selectedPatient.id);
             
-            // Update the patient in local state
             const updatedPatients = patients.map(patient => {
                 if (patient.id === selectedPatient.id) {
                     const updatedRelationships = { ...patient.relationships || {} };
@@ -261,7 +235,6 @@ const PatientView = ({ userId }) => {
             setActionLoading(true);
             await removeDoctorFromPatient(doctorId, patientId);
             
-            // Update the patient in local state
             const updatedPatients = patients.map(patient => {
                 if (patient.id === patientId) {
                     const updatedRelationships = { ...patient.relationships || {} };
@@ -288,12 +261,9 @@ const PatientView = ({ userId }) => {
         }
     };
 
-    // CARETAKER MANAGEMENT FUNCTIONS
     const openCaretakerSelectionModal = (patient) => {
         setSelectedPatient(patient);
         
-        // Get caretakers that are not already assigned to any patient
-        // This ensures each caretaker is assigned to at most one patient
         const assignedCaretakerIds = patients
             .filter(p => p.id !== patient.id && p.relationships?.caretakerId)
             .map(p => p.relationships.caretakerId);
@@ -318,7 +288,6 @@ const PatientView = ({ userId }) => {
         try {
             setActionLoading(true);
             
-            // Add debug logging
             console.log('Adding caretaker:', {
                 doctorId: userId,
                 patientId: selectedPatient.id,
@@ -327,7 +296,6 @@ const PatientView = ({ userId }) => {
             
             await addCaretakerToPatient(userId, selectedPatient.id, selectedCaretaker);
             
-            // Update the patient in local state
             const updatedPatients = patients.map(patient => {
                 if (patient.id === selectedPatient.id) {
                     return {
@@ -360,7 +328,6 @@ const PatientView = ({ userId }) => {
             setActionLoading(true);
             await removeCaretakerFromPatient(userId, patientId, caretakerId);
             
-            // Update the patient in local state
             const updatedPatients = patients.map(patient => {
                 if (patient.id === patientId) {
                     const updatedRelationships = { ...patient.relationships || {} };
@@ -383,7 +350,6 @@ const PatientView = ({ userId }) => {
         }
     };
 
-    // Loading and error states
     if (loading) {
         return <div>Ladataan potilaita...</div>;
     }
@@ -450,19 +416,16 @@ const PatientView = ({ userId }) => {
                         </thead>
                         <tbody>
                             {filteredPatients.map((patient) => {
-                                // Find caretaker if patient has one
                                 const patientCaretakerId = patient.relationships?.caretakerId;
                                 const caretaker = patientCaretakerId 
                                     ? caretakers.find(c => c.id === patientCaretakerId) 
                                     : null;
                                 
-                                // Find doctors assigned to patient
                                 const patientDoctorIds = patient.relationships?.doctorIds || [];
                                 const patientDoctors = patientDoctorIds
                                     .map(id => doctors.find(d => d.id === id))
                                     .filter(Boolean);
                                 
-                                // Check if there are available doctors to add
                                 const hasAvailableDoctors = doctors.some(doctor => 
                                     !patientDoctorIds.includes(doctor.id) && doctor.id !== userId
                                 );
@@ -600,7 +563,6 @@ const PatientView = ({ userId }) => {
             isOpen={showCaretakerSelectionModal}
             patient={selectedPatient}
             caretakers={caretakers.filter(caretaker => {
-                // Exclude caretakers that are already assigned to other patients
                 const isAssignedToOtherPatient = patients.some(p => 
                 p.id !== selectedPatient?.id && 
                 p.relationships?.caretakerId === caretaker.id
