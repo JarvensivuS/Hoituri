@@ -236,18 +236,15 @@ export const removeDoctorFromPatient = async (doctorId, patientId) => {
   }
 };
 
-// api.js - Updated to include password field
 export const createUser = async (creatorId, userData) => {
   try {
-    // Validate required fields according to the actual backend implementation
     if (!userData.role || !userData.name || !userData.email || !userData.password) {
       throw new Error('Missing required fields: role, name, email, and password are required');
     }
     
-    // Log the request for debugging
     console.log('Creating user with data:', {
       ...userData,
-      password: '[REDACTED]' // Don't log actual password
+      password: '[REDACTED]' 
     });
     
     const response = await fetch(`${API_BASE_URL}/users`, {
@@ -264,7 +261,6 @@ export const createUser = async (creatorId, userData) => {
       }),
     });
     
-    // Get the response data
     let responseData;
     try {
       responseData = await response.json();

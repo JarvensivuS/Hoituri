@@ -11,16 +11,14 @@ const MedicationSchedule = ({ userId }) => {
   const fetchReminders = async () => {
     try {
       setLoading(true);
-      // Fetch prescriptions where the logged-in doctor is the doctor
       const prescriptionsData = await getPrescriptions(userId, { doctorId: userId });
       
-      // Transform data for the component
       const remindersList = prescriptionsData.map(prescription => {
         return {
           id: prescription.id,
           medicine: prescription.medication,
           patientId: prescription.patientId,
-          patientName: prescription.patientName || "Tuntematon", // This may need to be fetched separately
+          patientName: prescription.patientName || "Tuntematon", 
           dosage: prescription.dosage,
           day: getDayFromFrequency(prescription.frequency),
           time: prescription.reminderSettings?.times[0] || "08:00",
@@ -44,9 +42,7 @@ const MedicationSchedule = ({ userId }) => {
     }
   }, [userId]);
 
-  // Helper function to extract day from frequency
   const getDayFromFrequency = (frequency) => {
-    // Simple implementation - in a real app, you'd have more complex logic
     if (frequency.includes("kertaa päivässä")) {
       return "Joka päivä";
     }
