@@ -77,7 +77,7 @@ const PatientView = ({ userId }) => {
         setShowAddPatientModal(true);
     };
 
-    const handleCreatePatient = async (password = "Patient123") => {
+    const handleCreatePatient = async (password = "password123") => {
         if (!newPatientName || !newPatientEmail) {
           alert("Potilaan nimi ja sähköposti ovat pakollisia kenttiä");
           return;
