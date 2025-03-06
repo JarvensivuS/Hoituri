@@ -21,7 +21,10 @@ function App() {
         email: userEmail,
         name: userName,
         role: userRole
-      });
+      })
+      
+      
+      ;
     }
     
     setLoading(false);
