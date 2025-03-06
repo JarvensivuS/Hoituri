@@ -1,23 +1,24 @@
-const AddDoctorButton = ({ onClick, disabled }) => {
+import "../styles/AddPatientButton.css";
+
+const AddPatientButton = ({ onClick, disabled }) => {
   return (
     <button
       onClick={onClick}
       style={{
-        marginRight: '10px',
-        marginBottom: '5px',
-        backgroundColor: '#28a745',
+        padding: '8px 16px',
+        backgroundColor: '#4CAF50',
         color: 'white',
         border: 'none',
         borderRadius: '4px',
-        padding: '5px 10px',
+        marginRight: '10px',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.7 : 1
       }}
       disabled={disabled}
     >
-      Lisää lääkäri
+      Lisää potilas
     </button>
   );
 };
 
-export default AddDoctorButton;
+export default AddPatientButton;

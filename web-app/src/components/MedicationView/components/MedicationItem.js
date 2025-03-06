@@ -1,12 +1,11 @@
-import { handleDeletePrescription } from "../utils/medicationHandlers";
-import "../styles.css"
+import RemoveButton from "../Buttons/RemoveButton";
+import "../styles/MedicationItem.css";
 
 const MedicationItem = ({ prescription, userId, onDelete }) => {
   const handleDelete = async () => {
     try {
-      const success = await handleDeletePrescription(userId, prescription.id);
-      if (success && onDelete) {
-        onDelete(prescription.id);
+      if (await onDelete(prescription.id)) {
+        // Successfully deleted - UI will be updated by parent component
       }
     } catch (error) {
       console.error("Error during deletion:", error);
@@ -25,12 +24,10 @@ const MedicationItem = ({ prescription, userId, onDelete }) => {
         {prescription.notifyCaretaker ? "Kyllä" : "Ei"}
       </td>
       <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-        <button 
+        <RemoveButton 
           onClick={handleDelete}
-          className="delete-btn"
-        >
-          Poista
-        </button>
+          text="Poista"
+        />
       </td>
     </tr>
   );

@@ -1,4 +1,5 @@
 import MedicationItem from "./MedicationItem";
+import "../styles/MedicationList.css";
 
 const MedicationList = ({ reminders, userId, onDeletePrescription }) => {
   if (!reminders || reminders.length === 0) {
