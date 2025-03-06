@@ -1,0 +1,41 @@
+.patient-list-item td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .patient-list-item-doctors {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .patient-list-item-doctor {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  
+  .patient-list-item-caretaker {
+    display: flex;
+    align-items: center;
+  }
+  
+  .doctor-button {
+    margin-right: 10px;
+    margin-bottom: 5px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+  }
+  
+  .caretaker-button {
+    margin-right: 10px;
+    margin-bottom: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    min-width: 120px;
+  }

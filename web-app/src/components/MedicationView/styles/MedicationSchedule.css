@@ -1,0 +1,15 @@
+.medication-schedule {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .medication-schedule-loading {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .medication-schedule-error {
+    text-align: center;
+    padding: 20px;
+    color: red;
+  }
