@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import MedicationSchedule from "./components/MedicationSchedule";
-import PatientView from "./components/PatientView";
-import Login from "./components/Login";
+import MedicationSchedule from "./components/MedicationView/components/MedicationSchedule";
+import PatientView from "./components/PatientView/components/PatientView";
+import Login from "./components/Login/Login";
 import "./styles.css";
 
 function App() {

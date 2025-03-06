@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ModalContainer from './ModalContainer';
+import '../styles/Modals.css'; 
 
 const PatientCreateModal = ({ 
   isOpen, 
@@ -69,20 +70,15 @@ const PatientCreateModal = ({
         
         <div className="modal-form-buttons">
           <button 
+            className="modal-cancel-button"
             onClick={onClose}
             disabled={isLoading}
           >
             Peruuta
           </button>
           <button 
+            className="modal-submit-button"
             onClick={handleSubmit}
-            style={{ 
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '8px 16px'
-            }}
             disabled={isLoading}
           >
             {isLoading ? "Lisätään..." : "Lisää potilas"}

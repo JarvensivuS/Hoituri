@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
-import { getPatients } from "../services/api";
-import { handleAddReminder, formatTimeString } from "../utils/medicationHandlers";
-import "../styles.css";
+import { formatTimeString } from "../hooks/medicationHandlers";
+import AddMedicationButton from "../Buttons/AddMedicationButton";
+import "../styles/MedicationForm.css";
 
-const MedicationForm = ({ userId, onAddSuccess }) => {
-  const [patients, setPatients] = useState([]);
+const MedicationForm = ({ userId, patients, onAddSuccess, isLoading }) => {
   const [selectedPatient, setSelectedPatient] = useState("");
   const [newMedicine, setNewMedicine] = useState("");
   const [dosage, setDosage] = useState("");
   const [newDay, setNewDay] = useState("Maanantai");
   const [newTime, setNewTime] = useState("");
   const [notifyCaretaker, setNotifyCaretaker] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Weekdays for drop menu
@@ -26,26 +25,10 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
   ];
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        setLoading(true);
-        const patientsData = await getPatients(userId);
-        setPatients(patientsData);
-        if (patientsData.length > 0) {
-          setSelectedPatient(patientsData[0].id);
-        }
-      } catch (err) {
-        console.error("Failed to load patients:", err);
-        setError("Potilaiden lataaminen epäonnistui");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userId) {
-      fetchPatients();
+    if (patients.length > 0 && !selectedPatient) {
+      setSelectedPatient(patients[0].id);
     }
-  }, [userId]);
+  }, [patients, selectedPatient]);
 
   // Function to convert day to frequency
   const getFrequencyFromDay = (day) => {
@@ -72,7 +55,9 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
     }
 
     try {
-      setLoading(true);
+      setFormLoading(true);
+      setError(null);
+      
       // Calculate dates
       const startDate = new Date().toISOString().split("T")[0]; // Today
       const endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]; // 30 days from now
@@ -93,8 +78,8 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
         }
       };
 
-      // Send the prescription to the API
-      await handleAddReminder(userId, prescriptionData);
+      // Call the onAddSuccess callback with the prescription data
+      await onAddSuccess(prescriptionData);
 
       // Reset input fields
       setNewMedicine("");
@@ -102,17 +87,14 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
       setDosage("");
       setNewDay("Maanantai");
       setNotifyCaretaker(true);
-
-      // Notify parent component to refresh data
-      if (onAddSuccess) {
-        onAddSuccess();
-      }
     } catch (err) {
-      setError("Lääkemuistutuksen lisääminen epäonnistui: " + err.message);
+      setError("Lääkemuistutuksen lisääminen epäonnistui: " + (err.message || ""));
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
+
+  const isSubmitDisabled = formLoading || isLoading || !selectedPatient || patients.length === 0;
 
   return (
     <div className="medication-form">
@@ -125,7 +107,7 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
         <select
           value={selectedPatient}
           onChange={(e) => setSelectedPatient(e.target.value)}
-          disabled={patients.length === 0 || loading}
+          disabled={patients.length === 0 || formLoading}
         >
           {patients.length === 0 ? (
             <option value="">Ei potilaita</option>
@@ -146,7 +128,7 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
           placeholder="Lääkkeen nimi"
           value={newMedicine}
           onChange={(e) => setNewMedicine(e.target.value)}
-          disabled={loading}
+          disabled={formLoading}
         />
       </div>
 
@@ -157,7 +139,7 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
           placeholder="esim. 1 tabletti"
           value={dosage}
           onChange={(e) => setDosage(e.target.value)}
-          disabled={loading}
+          disabled={formLoading}
         />
       </div>
 
@@ -166,7 +148,7 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
         <select
           value={newDay}
           onChange={(e) => setNewDay(e.target.value)}
-          disabled={loading}
+          disabled={formLoading}
         >
           {weekdays.map((day, index) => (
             <option key={index} value={day}>
@@ -185,7 +167,7 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
           onChange={handleTimeChange}
           placeholder="00:00"
           maxLength={5}
-          disabled={loading}
+          disabled={formLoading}
         />
       </div>
 
@@ -195,18 +177,17 @@ const MedicationForm = ({ userId, onAddSuccess }) => {
             type="checkbox"
             checked={notifyCaretaker}
             onChange={(e) => setNotifyCaretaker(e.target.checked)}
-            disabled={loading}
+            disabled={formLoading}
           />
           Jaa tieto hoitajalle (potilaan luvalla)
         </label>
       </div>
 
-      <button
-        onClick={addReminder}
-        disabled={loading || !selectedPatient || patients.length === 0}
-      >
-        {loading ? "Lisätään..." : "Lisää lääkemuistutus"}
-      </button>
+      <AddMedicationButton 
+        onClick={addReminder} 
+        disabled={isSubmitDisabled}
+        text={formLoading ? "Lisätään..." : "Lisää lääkemuistutus"}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { createPrescription, deletePrescription } from '../services/api';
+import { createPrescription, deletePrescription } from '../../../services/api';
 
 export const handleAddReminder = async (userId, prescriptionData) => {
   try {
