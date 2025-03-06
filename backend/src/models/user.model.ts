@@ -14,6 +14,7 @@ export interface User {
   name: string;
   email: string;
   password?: string; 
+  phoneNumber?: string;
   relationships?: UserRelationships;
   permissions?: UserPermissions;
 }
@@ -39,7 +40,10 @@ export const validateUserData = (data: Partial<User>): string[] => {
     errors.push('Invalid email format');
   }
 
-  // Add password validation if provided
+  if (data.phoneNumber && !/^[+]?[0-9\s-]{7,15}$/.test(data.phoneNumber)) {
+    errors.push('Invalid phone number format');
+  }
+
   if (data.password !== undefined) {
     if (data.password.length < 6) {
       errors.push('Password must be at least 6 characters');

@@ -10,7 +10,6 @@ import {
 } from "../services/api";
 import RemoveButton from './ui/RemoveButton';
 import AddDoctorModal from './modals/AddDoctorModal';
-import CaretakerModal from './modals/CaretakerModal';
 import PatientCreateModal from './modals/PatientCreateModal';
 import CaretakerCreateModal from './modals/CaretakerCreateModal';
 import "../styles.css";
@@ -27,16 +26,15 @@ const PatientView = ({ userId }) => {
     const [showAddPatientModal, setShowAddPatientModal] = useState(false);
     const [newPatientName, setNewPatientName] = useState("");
     const [newPatientEmail, setNewPatientEmail] = useState("");
-    
+
     const [showAddCaretakerModal, setShowAddCaretakerModal] = useState(false);
     const [newCaretakerName, setNewCaretakerName] = useState("");
     const [newCaretakerEmail, setNewCaretakerEmail] = useState("");
-    
+    const [newCaretakerPhone, setNewCaretakerPhone] = useState("");
+
     const [showDoctorModal, setShowDoctorModal] = useState(false);
-    const [showCaretakerSelectionModal, setShowCaretakerSelectionModal] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [selectedDoctor, setSelectedDoctor] = useState("");
-    const [selectedCaretaker, setSelectedCaretaker] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -78,100 +76,133 @@ const PatientView = ({ userId }) => {
         setShowAddPatientModal(true);
     };
 
-    const handleCreatePatient = async (password = "password123") => {
+    const handleCreatePatient = async (password = "password123", phoneNumber = "") => {
         if (!newPatientName || !newPatientEmail) {
           alert("Potilaan nimi ja sähköposti ovat pakollisia kenttiä");
           return;
         }
-    
+      
         try {
-        setActionLoading(true);
+          setActionLoading(true);
         
-        const patientData = {
+          const patientData = {
             role: "patient",
             name: newPatientName,
             email: newPatientEmail,
-            password: password
-        };
-        
-        console.log("Creating patient with data:", {
+            password: password,
+            phoneNumber: phoneNumber || undefined 
+          };
+          
+          console.log("Creating patient with data:", {
             ...patientData,
             password: '[REDACTED]'
-        });
-        
-        const newPatientResponse = await createUser(userId, patientData);
-        
-        console.log("Patient created successfully:", newPatientResponse);
-        
-        if (newPatientResponse && newPatientResponse.id) {
+          });
+          
+          const newPatientResponse = await createUser(userId, patientData);
+          
+          console.log("Patient created successfully:", newPatientResponse);
+          
+          if (newPatientResponse && newPatientResponse.id) {
             try {
-            await addDoctorToPatient(userId, newPatientResponse.id);
-            
-            const updatedPatient = {
+              await addDoctorToPatient(userId, newPatientResponse.id);
+              
+              const updatedPatient = {
                 ...newPatientResponse,
                 relationships: {
-                doctorIds: [userId]
+                  doctorIds: [userId]
                 }
-            };
-            
-            setPatients([...patients, updatedPatient]);
-            setShowAddPatientModal(false);
-            
-            alert("Potilas lisätty onnistuneesti!");
+              };
+              
+              setPatients([...patients, updatedPatient]);
+              setShowAddPatientModal(false);
+              
+              alert("Potilas lisätty onnistuneesti!");
             } catch (relationError) {
-            console.error("Failed to add doctor relationship:", relationError);
-            alert("Potilas luotiin, mutta lääkärisuhdetta ei voitu asettaa.");
+              console.error("Failed to add doctor relationship:", relationError);
+              alert("Potilas luotiin, mutta lääkärisuhdetta ei voitu asettaa.");
             }
-        }
+          }
         } catch (err) {
-        console.error("Failed to create patient:", err);
-        alert(`Potilaan lisääminen epäonnistui: ${err.message || 'Tuntematon virhe'}`);
+          console.error("Failed to create patient:", err);
+          alert(`Potilaan lisääminen epäonnistui: ${err.message || 'Tuntematon virhe'}`);
         } finally {
-        setActionLoading(false);
+          setActionLoading(false);
         }
+      };
+      
+    const openAddCaretakerModal = (patient) => {
+        setSelectedPatient(patient);
+        setNewCaretakerName("");
+        setNewCaretakerEmail("");
+        setNewCaretakerPhone("");
+        setShowAddCaretakerModal(true);
     };
       
     const handleCreateCaretaker = async () => {
         if (!newCaretakerName || !newCaretakerEmail) {
-        alert("Hoitajan nimi ja sähköposti ovat pakollisia kenttiä");
-        return;
+          alert("Hoitajan nimi ja sähköposti ovat pakollisia kenttiä");
+          return;
         }
-    
-        try {
-        setActionLoading(true);
         
-        const caretakerData = {
+        if (!selectedPatient) {
+          alert("Potilasta ei ole valittu");
+          return;
+        }
+      
+        try {
+          setActionLoading(true);
+          
+          const caretakerData = {
             role: "caretaker",
             name: newCaretakerName,
             email: newCaretakerEmail,
+            phoneNumber: newCaretakerPhone,
             password: "password123"
-        };
-        
-        console.log("Creating caretaker with data:", {
+          };
+          
+          console.log("Creating caretaker with data:", {
             ...caretakerData,
             password: '[REDACTED]'
-        });
-        
-        const newCaretakerResponse = await createUser(userId, caretakerData);
-        
-        console.log("Caretaker created successfully:", newCaretakerResponse);
-        
-        setCaretakers([...caretakers, newCaretakerResponse]);
-        setShowAddCaretakerModal(false);
-        
-        alert("Hoitaja lisätty onnistuneesti!");
+          });
+          
+          const newCaretakerResponse = await createUser(userId, caretakerData);
+          
+          console.log("Caretaker created successfully:", newCaretakerResponse);
+          
+          if (newCaretakerResponse && newCaretakerResponse.id) {
+            try {
+              await addCaretakerToPatient(userId, selectedPatient.id, newCaretakerResponse.id);
+              
+              const updatedPatients = patients.map(patient => {
+                if (patient.id === selectedPatient.id) {
+                  return {
+                    ...patient,
+                    relationships: {
+                      ...patient.relationships || {},
+                      caretakerId: newCaretakerResponse.id
+                    }
+                  };
+                }
+                return patient;
+              });
+              
+              setPatients(updatedPatients);
+            } catch (relationError) {
+              console.error("Failed to set patient-caretaker relationship:", relationError);
+              alert("Hoitaja luotiin, mutta potilassuhdetta ei voitu asettaa.");
+            }
+          }
+          
+          setCaretakers([...caretakers, newCaretakerResponse]);
+          setShowAddCaretakerModal(false);
+          
+          alert("Hoitaja lisätty onnistuneesti!");
         } catch (err) {
-        console.error("Failed to create caretaker:", err);
-        alert(`Hoitajan lisääminen epäonnistui: ${err.message || 'Tuntematon virhe'}`);
+          console.error("Failed to create caretaker:", err);
+          alert(`Hoitajan lisääminen epäonnistui: ${err.message || 'Tuntematon virhe'}`);
         } finally {
-        setActionLoading(false);
+          setActionLoading(false);
         }
-    };
-
-    const openAddCaretakerModal = () => {
-        setNewCaretakerName("");
-        setNewCaretakerEmail("");
-        setShowAddCaretakerModal(true);
     };
 
     const openDoctorModal = (patient) => {
@@ -262,64 +293,6 @@ const PatientView = ({ userId }) => {
         }
     };
 
-    const openCaretakerSelectionModal = (patient) => {
-        setSelectedPatient(patient);
-        
-        const assignedCaretakerIds = patients
-            .filter(p => p.id !== patient.id && p.relationships?.caretakerId)
-            .map(p => p.relationships.caretakerId);
-        
-        const availableCaretakers = caretakers.filter(caretaker => 
-            !assignedCaretakerIds.includes(caretaker.id)
-        );
-        
-        if (availableCaretakers.length > 0) {
-            setSelectedCaretaker(availableCaretakers[0].id);
-            setShowCaretakerSelectionModal(true);
-        } else {
-            alert("Ei saatavilla olevia hoitajia. Lisää ensin uusi hoitaja.");
-        }
-    };
-
-    const handleAddCaretaker = async () => {
-        if (!selectedPatient || !selectedCaretaker) {
-            return;
-        }
-        
-        try {
-            setActionLoading(true);
-            
-            console.log('Adding caretaker:', {
-                doctorId: userId,
-                patientId: selectedPatient.id,
-                caretakerId: selectedCaretaker
-            });
-            
-            await addCaretakerToPatient(userId, selectedPatient.id, selectedCaretaker);
-            
-            const updatedPatients = patients.map(patient => {
-                if (patient.id === selectedPatient.id) {
-                    return {
-                        ...patient,
-                        relationships: {
-                            ...patient.relationships || {},
-                            caretakerId: selectedCaretaker
-                        }
-                    };
-                }
-                return patient;
-            });
-            
-            setPatients(updatedPatients);
-            setShowCaretakerSelectionModal(false);
-        } catch (err) {
-            console.error("Failed to add caretaker:", err);
-            alert(`Hoitajan lisääminen epäonnistui: ${err.message || 'Tuntematon virhe'}`);
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
     const handleRemoveCaretaker = async (patientId, caretakerId) => {
         if (!confirm("Haluatko varmasti poistaa hoitajan?")) {
             return;
@@ -370,19 +343,6 @@ const PatientView = ({ userId }) => {
                         disabled={actionLoading}
                     >
                         Lisää uusi potilas
-                    </button>
-                    <button 
-                        onClick={openAddCaretakerModal}
-                        style={{
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            padding: '8px 16px'
-                        }}
-                        disabled={actionLoading}
-                    >
-                        Lisää uusi hoitaja
                     </button>
                 </div>
                 <input
@@ -487,7 +447,7 @@ const PatientView = ({ userId }) => {
                                             )}
                                             
                                             <button
-                                                onClick={() => openCaretakerSelectionModal(patient)}
+                                                onClick={() => openAddCaretakerModal(patient)}
                                                 style={{
                                                     marginRight: '10px',
                                                     marginBottom: '5px',
@@ -498,7 +458,7 @@ const PatientView = ({ userId }) => {
                                                     padding: '5px 10px',
                                                     minWidth: '120px'
                                                 }}
-                                                disabled={actionLoading || caretakers.length === 0}
+                                                disabled={actionLoading}
                                             >
                                                 {patientCaretakerId ? 'Vaihda hoitaja' : 'Lisää hoitaja'}
                                             </button>
@@ -513,68 +473,53 @@ const PatientView = ({ userId }) => {
             
             {/* Modals */}
             <PatientCreateModal 
-            isOpen={showAddPatientModal} 
-            onClose={() => setShowAddPatientModal(false)} 
-            patientName={newPatientName}
-            onPatientNameChange={setNewPatientName}
-            patientEmail={newPatientEmail}
-            onPatientEmailChange={setNewPatientEmail}
-            onSubmit={handleCreatePatient}
-            isLoading={actionLoading}
+                isOpen={showAddPatientModal} 
+                onClose={() => setShowAddPatientModal(false)} 
+                patientName={newPatientName}
+                onPatientNameChange={setNewPatientName}
+                patientEmail={newPatientEmail}
+                onPatientEmailChange={setNewPatientEmail}
+                onSubmit={handleCreatePatient}
+                isLoading={actionLoading}
             />
-            
+
             <CaretakerCreateModal 
-            isOpen={showAddCaretakerModal} 
-            onClose={() => setShowAddCaretakerModal(false)} 
-            caretakerName={newCaretakerName}
-            onCaretakerNameChange={setNewCaretakerName}
-            caretakerEmail={newCaretakerEmail}
-            onCaretakerEmailChange={setNewCaretakerEmail}
-            onSubmit={handleCreateCaretaker}
-            isLoading={actionLoading}
+                isOpen={showAddCaretakerModal} 
+                onClose={() => {
+                    setShowAddCaretakerModal(false);
+                    setSelectedPatient(null);
+                }} 
+                caretakerName={newCaretakerName}
+                onCaretakerNameChange={setNewCaretakerName}
+                caretakerEmail={newCaretakerEmail}
+                onCaretakerEmailChange={setNewCaretakerEmail}
+                caretakerPhone={newCaretakerPhone}
+                onCaretakerPhoneChange={setNewCaretakerPhone}
+                patientName={selectedPatient?.name || ""}
+                onSubmit={handleCreateCaretaker}
+                isLoading={actionLoading}
             />
             
             {/* Doctor Selection Modal */}
             <AddDoctorModal 
-            isOpen={showDoctorModal}
-            patient={selectedPatient}
-            doctors={doctors.filter(doctor => {
-                if (!selectedPatient) return false;
-                const patientDoctorIds = selectedPatient.relationships?.doctorIds || [];
-                return !patientDoctorIds.includes(doctor.id);
-            })}
-            selectedDoctor={selectedDoctor}
-            onDoctorChange={setSelectedDoctor}
-            onSubmit={handleAddDoctor}
-            onClose={() => {
-                setShowDoctorModal(false);
-                setSelectedPatient(null);
-            }}
-            isLoading={actionLoading}
-            />
-            
-            {/* Caretaker Selection Modal */}
-            <CaretakerModal 
-            isOpen={showCaretakerSelectionModal}
-            patient={selectedPatient}
-            caretakers={caretakers.filter(caretaker => {
-                const isAssignedToOtherPatient = patients.some(p => 
-                p.id !== selectedPatient?.id && 
-                p.relationships?.caretakerId === caretaker.id
-                );
-                return !isAssignedToOtherPatient;
-            })}
-            selectedCaretaker={selectedCaretaker}
-            onCaretakerChange={setSelectedCaretaker}
-            onAddCaretaker={handleAddCaretaker}
-            onClose={() => {
-                setShowCaretakerSelectionModal(false);
-                setSelectedPatient(null);
-            }}
-            isLoading={actionLoading}
+                isOpen={showDoctorModal}
+                patient={selectedPatient}
+                doctors={doctors.filter(doctor => {
+                    if (!selectedPatient) return false;
+                    const patientDoctorIds = selectedPatient.relationships?.doctorIds || [];
+                    return !patientDoctorIds.includes(doctor.id);
+                })}
+                selectedDoctor={selectedDoctor}
+                onDoctorChange={setSelectedDoctor}
+                onSubmit={handleAddDoctor}
+                onClose={() => {
+                    setShowDoctorModal(false);
+                    setSelectedPatient(null);
+                }}
+                isLoading={actionLoading}
             />
         </div>
-        );
+    );
 };
 
 export default PatientView;

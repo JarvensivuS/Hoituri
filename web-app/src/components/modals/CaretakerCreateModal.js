@@ -7,60 +7,74 @@ const CaretakerCreateModal = ({
   onCaretakerNameChange,
   caretakerEmail,
   onCaretakerEmailChange,
+  caretakerPhone,
+  onCaretakerPhoneChange,
+  patientName,
   onSubmit,
   isLoading
 }) => {
   return (
     <ModalContainer 
-    isOpen={isOpen} 
-    title="Lisää uusi hoitaja" 
-    onClose={onClose}
+      isOpen={isOpen} 
+      title={`Lisää uusi hoitaja potilaalle ${patientName}`} 
+      onClose={onClose}
     >
-    <div className="modal-form">
-      <div>
-        <label htmlFor="caretakerName">Nimi:</label>
-        <input 
-          id="caretakerName"
-          type="text"
-          value={caretakerName}
-          onChange={(e) => onCaretakerNameChange(e.target.value)}
-          disabled={isLoading}
-        />
+      <div className="modal-form">
+        <div>
+          <label htmlFor="caretakerName">Nimi:</label>
+          <input 
+            id="caretakerName"
+            type="text"
+            value={caretakerName}
+            onChange={(e) => onCaretakerNameChange(e.target.value)}
+            disabled={isLoading}
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="caretakerEmail">Sähköposti:</label>
+          <input 
+            id="caretakerEmail"
+            type="email"
+            value={caretakerEmail}
+            onChange={(e) => onCaretakerEmailChange(e.target.value)}
+            disabled={isLoading}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="caretakerPhone">Puhelinnumero:</label>
+          <input 
+            id="caretakerPhone"
+            type="tel"
+            value={caretakerPhone}
+            onChange={(e) => onCaretakerPhoneChange(e.target.value)}
+            disabled={isLoading}
+          />
+        </div>
+        
+        <div className="modal-form-buttons">
+          <button 
+            onClick={onClose}
+            disabled={isLoading}
+          >
+            Peruuta
+          </button>
+          <button 
+            onClick={onSubmit}
+            style={{ 
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '8px 16px'
+            }}
+            disabled={isLoading}
+          >
+            {isLoading ? "Lisätään..." : "Lisää hoitaja"}
+          </button>
+        </div>
       </div>
-      
-      <div>
-        <label htmlFor="caretakerEmail">Sähköposti:</label>
-        <input 
-          id="caretakerEmail"
-          type="email"
-          value={caretakerEmail}
-          onChange={(e) => onCaretakerEmailChange(e.target.value)}
-          disabled={isLoading}
-        />
-      </div>
-      
-      <div className="modal-form-buttons">
-        <button 
-          onClick={onClose}
-          disabled={isLoading}
-        >
-          Peruuta
-        </button>
-        <button 
-          onClick={onSubmit}
-          style={{ 
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            padding: '8px 16px'
-        }}
-          disabled={isLoading}
-        >
-          {isLoading ? "Lisätään..." : "Lisää hoitaja"}
-        </button>
-      </div>
-    </div>
     </ModalContainer>
   );
 };

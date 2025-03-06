@@ -257,7 +257,8 @@ export const createUser = async (creatorId, userData) => {
         role: userData.role,
         name: userData.name,
         email: userData.email,
-        password: userData.password
+        password: userData.password,
+        phoneNumber: userData.phoneNumber
       }),
     });
     
