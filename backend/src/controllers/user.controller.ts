@@ -11,6 +11,7 @@ interface UserData {
   name: string;
   email: string;
   password?: string;
+  phoneNumber?: string; 
 }
 
 const isValidEmail = (email: string): boolean => {
@@ -64,8 +65,7 @@ export const createUser = async (req: Request, res: Response) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const userRef = db.collection('users').doc();
-    const user = {
+    const user: Record<string, any> = {
       role,
       name,
       email,
@@ -74,6 +74,13 @@ export const createUser = async (req: Request, res: Response) => {
       updatedAt: new Date().toISOString()
     };
 
+    for (const [key, value] of Object.entries(req.body)) {
+      if (value !== undefined && !['role', 'name', 'email', 'password'].includes(key)) {
+        user[key] = value;
+      }
+    }
+
+    const userRef = db.collection('users').doc();
     await userRef.set(user);
 
     const { password: _, ...userWithoutPassword } = user;
