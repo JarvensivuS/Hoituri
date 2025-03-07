@@ -26,29 +26,40 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ setScreen }) => {
     setLoading(true);
 
     try {
-      const userData = await loginUser(email, password, "web");
+      const userData = await loginUser(email, password, "mobile");
 
       await AsyncStorage.setItem("userId", userData.id);
       await AsyncStorage.setItem("userEmail", userData.email);
       await AsyncStorage.setItem("userName", userData.name);
       await AsyncStorage.setItem("userRole", userData.role);
 
-      Alert.alert("Onnistui!", "Kirjautuminen onnistui!");
-      setScreen("Home"); // Change screen after successful login
+      if (userData.role === "caretaker") {
+        setScreen("CaretakerHome");
+        console.log("caretaker")
+      } else if (userData.role === "patient") {
+        setScreen("Home");
+        console.log("patient")
+      } else {
+        // Fallback in case the role isn't recognized
+        console.log("no role")
+      }
+      //Alert.alert("Onnistui!", "Kirjautuminen onnistui!");
+      //setScreen("Home"); // Change screen after successful login
     } catch (err: unknown) {
       console.error("Login failed:", err);
       const errorMessage = (err as Error).message;
 
-      if (errorMessage === "Only doctors can log in to the web application") {
-        setError("Vain lääkärit voivat kirjautua tähän sovellukseen");
-        Alert.alert("Virhe", "Vain lääkärit voivat kirjautua tähän sovellukseen");
+      if (errorMessage === "Doctors should use the web application") {
+        setError("Lääkäreiden tulee käyttää web-sovellusta");
+        //Alert.alert("Virhe", "Vain lääkärit voivat kirjautua tähän sovellukseen");
       } else {
         setError("Virheelliset tunnukset");
-        Alert.alert("Virhe", "Virheelliset tunnukset");
+        //Alert.alert("Virhe", "Virheelliset tunnukset");
       }
     } finally {
       setLoading(false);
     }
+    
   };
 
   return (
