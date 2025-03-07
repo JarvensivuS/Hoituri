@@ -1,13 +1,13 @@
-const API_BASE_URL = 'http://172.20.10.2:3001/api'; //put own IP here - in cmd run ipconfig to know
+const API_BASE_URL = 'http://192.168.101.109:3001/api'; //put own IP here - in cmd run ipconfig to know
 
-export const loginUser = async (email, password, platform = 'web') => {
+export const loginUser = async (email, password, platform = 'mobile') => {
   try {
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password, platform }),
+      body: JSON.stringify({ email, password, platform: 'mobile' }),
     });
 
     if (!response.ok) {

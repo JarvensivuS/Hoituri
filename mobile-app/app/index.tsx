@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import { SafeAreaView, StatusBar, View, TouchableOpacity, Text } from "react-native";
-import HomeScreen from "./screens/HomeScreen";
-import LocationScreen from "./screens/LocationScreen";
+import HomeScreen from "./screens/HomeScreen"; // For patients
+import CaretakerHomeScreen from "./screens/CaretakerHomeScreen";
+import LocationScreen from "./screens/LocationScreen"; // For patients
+import CaretakerLocationScreen from "./screens/CaretakerLocationScreen"; // For caretakers
 import LoginScreen from "./screens/LoginScreen";
 import LocationTracker from "./components/LocationTracker";
 import { HomeProvider } from "./components/HomeContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
 
 const App = () => {
   const [screen, setScreen] = useState("LoginScreen");
 
-  // Jos käyttäjä on kirjautumassa, näytetään ainoastaan LoginScreen
+  // If user is logging in, show only LoginScreen
   if (screen === "LoginScreen") {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -25,7 +28,7 @@ const App = () => {
     );
   }
 
-  // Kun käyttäjä on kirjautunut sisään, näytetään HomeProvider ja LocationTracker ympäröimässä sisältöä
+  // Once logged in, wrap content with HomeProvider and LocationTracker
   return (
     <HomeProvider>
       <LocationTracker>
@@ -35,37 +38,74 @@ const App = () => {
             backgroundColor={styles.statusBar.backgroundColor}
           />
 
-          {/* Yläpalkki, näkyy vain kirjautuneille */}
+          {/* Top navigation header */}
           <View style={styles.topNav}>
+            {/* Logout button */}
             <TouchableOpacity
               onPress={() => setScreen("LoginScreen")}
-              style={[styles.backButton, { display: screen === "Home" ? "flex" : "none" }]}
+              style={[
+                styles.backButton,
+                { display: (screen === "Home" || screen === "CaretakerHome") ? "flex" : "none" }
+              ]}
             >
               <Text style={styles.navText}>Kirjaudu ulos</Text>
             </TouchableOpacity>
+
+            {/* Back button for location screens */}
             <TouchableOpacity
-              onPress={() => setScreen("Home")}
-              style={[styles.backButton, { display: screen === "LocationScreen" ? "flex" : "none" }]}
+              onPress={async () => {
+                const role = await AsyncStorage.getItem("userRole");
+                if (role === "caretaker") {
+                  setScreen("CaretakerHome");
+                } else {
+                  setScreen("Home");
+                }
+              }}
+              style={[
+                styles.backButton,
+                { display: (screen === "LocationScreen" || screen === "CaretakerLocationScreen") ? "flex" : "none" }
+              ]}
             >
               <Text style={styles.navText}>← Aloitus</Text>
             </TouchableOpacity>
-            
+
             <Text style={styles.titleText}>
-              {screen === "Home" ? "Aloitus" : screen === "LocationScreen" ? "Sijainti" : "Kirjautuminen"}
+              {screen === "Home"
+                ? "Aloitus (patient)"
+                : screen === "CaretakerHome"
+                ? "Aloitus (caretaker)"
+                : screen === "LocationScreen"
+                ? "Sijainti (patient)"
+                : screen === "CaretakerLocationScreen"
+                ? "Sijainti (caretaker)"
+                : "Kirjautuminen"}
             </Text>
-    
+
+            {/* Forward button for navigating to location screens */}
             <TouchableOpacity
-              onPress={() => setScreen("LocationScreen")}
-              style={[styles.forwardButton, { display: screen === "Home" ? "flex" : "none" }]}
+              onPress={async () => {
+                const role = await AsyncStorage.getItem("userRole");
+                if (role === "caretaker") {
+                  setScreen("CaretakerLocationScreen");
+                } else {
+                  setScreen("LocationScreen");
+                }
+              }}
+              style={[
+                styles.forwardButton,
+                { display: (screen === "Home" || screen === "CaretakerHome") ? "flex" : "none" }
+              ]}
             >
               <Text style={styles.navText}>Sijainti →</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Näytetään sisältö kirjautuneille */}
+          {/* Main content area */}
           <View style={styles.screenContent}>
             {screen === "Home" && <HomeScreen setScreen={setScreen} />}
+            {screen === "CaretakerHome" && <CaretakerHomeScreen setScreen={setScreen} />}
             {screen === "LocationScreen" && <LocationScreen setScreen={setScreen} />}
+            {screen === "CaretakerLocationScreen" && <CaretakerLocationScreen setScreen={setScreen} />}
           </View>
         </SafeAreaView>
       </LocationTracker>
