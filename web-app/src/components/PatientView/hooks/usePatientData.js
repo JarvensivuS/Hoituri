@@ -94,7 +94,7 @@ export default function usePatientData(userId) {
 
   const createCaretaker = async (patientId, caretakerName, caretakerEmail, caretakerPhone = "") => {
     if (!caretakerName || !caretakerEmail) {
-      throw new Error("Hoitajan nimi ja sähköposti ovat pakollisia kenttiä");
+      throw new Error("Omaisen nimi ja sähköposti ovat pakollisia kenttiä");
     }
     
     if (!patientId) {
@@ -137,7 +137,7 @@ export default function usePatientData(userId) {
           return newCaretakerResponse;
         } catch (relationError) {
           console.error("Failed to set patient-caretaker relationship:", relationError);
-          throw new Error("Hoitaja luotiin, mutta potilassuhdetta ei voitu asettaa.");
+          throw new Error("Omainen luotiin, mutta potilassuhdetta ei voitu asettaa.");
         }
       }
     } catch (err) {

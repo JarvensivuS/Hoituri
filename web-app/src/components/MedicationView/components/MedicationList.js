@@ -17,7 +17,7 @@ const MedicationList = ({ reminders, userId, onDeletePrescription }) => {
             <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #ddd" }}>Annostus</th>
             <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #ddd" }}>Päivä</th>
             <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #ddd" }}>Aika</th>
-            <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #ddd" }}>Jaettu hoitajalle</th>
+            <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #ddd" }}>Jaettu omaiselle</th>
             <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #ddd" }}>Toiminnot</th>
           </tr>
         </thead>

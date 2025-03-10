@@ -24,7 +24,7 @@ const PatientList = ({
             <th>Nimi</th>
             <th>Sähköposti</th>
             <th>Lääkärit</th>
-            <th>Hoitaja</th>
+            <th>Omainen</th>
             <th>Toiminnot</th>
           </tr>
         </thead>

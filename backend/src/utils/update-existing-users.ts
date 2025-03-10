@@ -12,7 +12,6 @@ const updateExistingUsers = async () => {
       return;
     }
     
-    // Default pw for all users testing purposes
     const defaultPassword = 'password123';
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(defaultPassword, saltRounds);
