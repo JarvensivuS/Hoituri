@@ -2,7 +2,7 @@
 import React, { useContext, useMemo } from "react";
 import { View, Text, Alert, TouchableOpacity, ActivityIndicator } from "react-native";
 import { WebView } from "react-native-webview";
-import { LocationContext } from "../components/LocationTracker";
+import { LocationContext } from "../components/LocationTrackerCareTaker";
 import { HomeContext } from "../components/HomeContext";
 import styles from "../styles";
 
@@ -92,7 +92,7 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
     <View style={styles.locationScreenContainer}>
       <View style={styles.headerContainer}>
         {homeSet && outsideHome && (
-          <Text style={styles.warningText}>OLET KODIN ULKOPUOLELLA!</Text>
+          <Text style={styles.warningText}>HOIDETTAVA ON KODIN ULKOPUOLELLA!</Text>
         )}
         <Text >CARETAKERLOKATION</Text>
         <Text style={styles.ScreenText}>Latitude: {location.latitude.toFixed(6)}</Text>
@@ -102,9 +102,9 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
         <WebView originWhitelist={["*"]} source={{ html: getHtmlContent() }} style={styles.webview} />
       </View>
       <View style={styles.bottomContainer}>
-        <TouchableOpacity onPress={handleSetHome} style={styles.homeButton}>
+       {/* <TouchableOpacity onPress={handleSetHome} style={styles.homeButton}>
           <Text style={styles.homeButtonText}>Aseta koti</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
