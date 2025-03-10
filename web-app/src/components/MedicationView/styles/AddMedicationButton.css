@@ -1,14 +1,19 @@
 .add-medication-button {
-    background: #007bff;
+    background-color: #007bff;
     color: white;
     padding: 0.75rem;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.3s ease;
   }
   
   .add-medication-button:disabled {
     background: #cccccc;
     cursor: not-allowed;
+  }
+
+  .add-medication-button:hover:not(:disabled) {
+    background-color: #0056b3;
   }
