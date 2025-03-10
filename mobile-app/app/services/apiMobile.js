@@ -1,5 +1,6 @@
-const API_BASE_URL = 'http://192.168.101.109:3001/api'; //put own IP here - in cmd run ipconfig to know
+const API_BASE_URL = 'http://192.168.1.103:3001/api'; // Käytä omaa IP:tä (ipconfig-komennolla)
 
+// Kirjautuminen
 export const loginUser = async (email, password, platform = 'mobile') => {
   try {
     const response = await fetch(`${API_BASE_URL}/login`, {
@@ -18,6 +19,64 @@ export const loginUser = async (email, password, platform = 'mobile') => {
     return await response.json();
   } catch (error) {
     console.error('Login error:', error);
+    throw error;
+  }
+};
+
+// Uusi metodi: Haetaan potilaan sijainti caretakerin näkökulmasta
+// Endpoint: GET /patients/:patientId/location
+// Headers: user-id: {userId}
+export const getPatientLocation = async (userId, patientId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/patients/${patientId}/location`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'user-id': userId,
+      }
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to fetch patient location');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching patient location:', error);
+    throw error;
+  }
+};
+
+// Uusi metodi: Potilaan näkökulmasta oman sijainnin lähettäminen patient-tauluun
+// Endpoint: PUT /patients/:patientId/location
+// Headers: user-id: {userId}, Content-Type: application/json
+// Request Body: { "latitude": number, "longitude": number, "isHome": boolean }
+export const updatePatientLocation = async (patientId, locationData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/patients/${patientId}/location`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        // Oletetaan, että potilaan käyttäjä-id on sama kuin patientId,
+        // mikäli ei näin, vaihda vastaavaan muuttujaan
+        'user-id': patientId 
+      },
+      body: JSON.stringify({
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
+        isHome: locationData.isHome,
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update patient location');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating patient location:', error);
     throw error;
   }
 };
