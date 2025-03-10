@@ -14,12 +14,12 @@ const CaretakerModal = ({
   return (
     <ModalContainer 
       isOpen={isOpen && patient} 
-      title={patient ? `Hoitajan hallinta - ${patient.name}` : 'Hoitajan hallinta'} 
+      title={patient ? `Omaisen hallinta - ${patient.name}` : 'Omaisen hallinta'} 
       onClose={onClose}
     >
       <div className="modal-form">
         <div>
-          <label>Valitse hoitaja:</label>
+          <label>Valitse Omainen:</label>
           <select 
             value={selectedCaretaker}
             onChange={(e) => onCaretakerChange(e.target.value)}
@@ -50,7 +50,7 @@ const CaretakerModal = ({
             onClick={onAddCaretaker}
             disabled={!selectedCaretaker || caretakers.length === 0 || isLoading}
           >
-            {isLoading ? "Lisätään..." : "Lisää hoitaja"}
+            {isLoading ? "Lisätään..." : "Lisää omainen"}
           </button>
         </div>
       </div>
