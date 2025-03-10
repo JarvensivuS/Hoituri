@@ -8,6 +8,13 @@ export interface UserPermissions {
   shareWithCaretaker: boolean;  
 }
 
+export interface UserLocation {
+  latitude: number;
+  longitude: number;
+  timestamp: string;
+  isHome: boolean;
+}
+
 export interface User {
   id?: string;
   role: 'doctor' | 'patient' | 'caretaker';
@@ -17,6 +24,11 @@ export interface User {
   phoneNumber?: string;
   relationships?: UserRelationships;
   permissions?: UserPermissions;
+  location?: UserLocation; 
+  homeLocation?: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 export const VALID_ROLES = ['doctor', 'patient', 'caretaker'] as const;

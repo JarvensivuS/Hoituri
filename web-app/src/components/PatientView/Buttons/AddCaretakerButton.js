@@ -7,7 +7,7 @@ const AddCaretakerButton = ({ onClick, disabled, hasCaretaker }) => {
       onClick={onClick}
       disabled={disabled}
     >
-      {hasCaretaker ? 'Vaihda hoitaja' : 'Lisää hoitaja'}
+      {hasCaretaker ? 'Vaihda omainen' : 'Lisää omainen'}
     </button>
   );
 };

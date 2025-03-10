@@ -17,7 +17,7 @@ const CaretakerCreateModal = ({
   return (
     <ModalContainer 
       isOpen={isOpen} 
-      title={`Lisää uusi hoitaja potilaalle ${patientName}`} 
+      title={`Lisää uusi omainen potilaalle ${patientName}`} 
       onClose={onClose}
     >
       <div className="modal-form">
@@ -67,7 +67,7 @@ const CaretakerCreateModal = ({
             onClick={onSubmit}
             disabled={isLoading}
           >
-            {isLoading ? "Lisätään..." : "Lisää hoitaja"}
+            {isLoading ? "Lisätään..." : "Lisää omainen"}
           </button>
         </div>
       </div>

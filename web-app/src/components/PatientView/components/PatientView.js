@@ -113,14 +113,14 @@ const PatientView = ({ userId }) => {
   };
 
   const handleRemoveCaretaker = async (patientId, caretakerId) => {
-    if (!confirm("Haluatko varmasti poistaa hoitajan?")) {
+    if (!confirm("Haluatko varmasti poistaa omaisen?")) {
       return;
     }
       
     try {
       await removeCaretaker(patientId, caretakerId);
     } catch (err) {
-      alert(`Hoitajan poistaminen epäonnistui: ${err.message || 'Tuntematon virhe'}`);
+      alert(`Omaisen poistaminen epäonnistui: ${err.message || 'Tuntematon virhe'}`);
     }
   };
 

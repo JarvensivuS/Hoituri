@@ -66,7 +66,7 @@ const PatientListItem = ({
               />
             </div>
           ) 
-          : 'Ei hoitajaa'
+          : 'Ei omaisia'
         }
       </td>
       

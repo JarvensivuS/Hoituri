@@ -179,7 +179,7 @@ const MedicationForm = ({ userId, patients, onAddSuccess, isLoading }) => {
             onChange={(e) => setNotifyCaretaker(e.target.checked)}
             disabled={formLoading}
           />
-          Jaa tieto hoitajalle (potilaan luvalla)
+          Jaa tieto omaiselle (potilaan luvalla)
         </label>
       </div>
 
