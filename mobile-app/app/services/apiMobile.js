@@ -88,17 +88,16 @@ export const getPatients = async (doctorId) => {
   }
 };
 
-export const getPrescriptions = async (doctorId, filters = {}) => {
+export const getPrescriptions = async (patientId) => {
   try {
     const queryParams = new URLSearchParams();
-    if (filters.patientId) queryParams.append('patientId', filters.patientId);
-    if (filters.doctorId) queryParams.append('doctorId', filters.doctorId);
+    queryParams.append('patientId', patientId);
     
     const url = `${API_BASE_URL}/prescriptions${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
     
     const response = await fetch(url, {
       headers: {
-        'user-id': doctorId
+        'user-id': patientId
       }
     });
     
@@ -113,6 +112,7 @@ export const getPrescriptions = async (doctorId, filters = {}) => {
     throw error;
   }
 };
+
 
 export const createPrescription = async (doctorId, prescriptionData) => {
   try {
