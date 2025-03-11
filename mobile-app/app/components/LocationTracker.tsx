@@ -1,8 +1,7 @@
-// components/LocationTracker.tsx
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { updatePatientLocation } from "../services/apiMobile"; // Säädä polku tarvittaessa
+import { updatePatientLocation } from "../services/apiMobile";
 
 export interface LocationData {
   latitude: number;
@@ -27,8 +26,10 @@ const LocationTracker: React.FC<LocationTrackerProps> = ({ children }) => {
     let subscription: Location.LocationSubscription | null = null;
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
+      console.log("Sijaintiluvan status:", status);
       if (status !== "granted") {
         setErrorMsg("Sijaintiluvan saaminen epäonnistui");
+        console.error("Sijaintiluvan status:", status);
         return;
       }
       
@@ -43,6 +44,8 @@ const LocationTracker: React.FC<LocationTrackerProps> = ({ children }) => {
             latitude: locationData.coords.latitude,
             longitude: locationData.coords.longitude,
           };
+          // Logataan uusi sijainti konsoliin
+          console.log("Uusi sijainti havaittu: Latitude:", newLocation.latitude, "Longitude:", newLocation.longitude);
           setLocation(newLocation);
         }
       );
@@ -62,8 +65,12 @@ const LocationTracker: React.FC<LocationTrackerProps> = ({ children }) => {
         try {
           const patientId = await AsyncStorage.getItem("patientId");
           if (patientId) {
-            // Tässä esimerkissä isHome asetetaan false, säädä arvo tarpeen mukaan
-            await updatePatientLocation(patientId, { ...location, isHome: false });
+            // Logataan lähetettävät arvot
+            console.log("Lähetetään sijainti tietokantaan: Latitude:", location.latitude, "Longitude:", location.longitude);
+            const response = await updatePatientLocation(patientId, { ...location, isHome: false });
+            console.log("Päivitysvastaus tietokannasta:", response);
+          } else {
+            console.error("Patient ID ei löydy AsyncStoragesta.");
           }
         } catch (error) {
           console.error("Virhe potilaan sijainnin päivittämisessä tietokantaan:", error);
