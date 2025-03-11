@@ -1,9 +1,6 @@
-
-//TODO GET patient langitude and longitude
-
-
 import React, { createContext, useState, useEffect, ReactNode } from "react";
-import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getPatientLocation } from "../services/apiMobile";
 
 export interface LocationData {
   latitude: number;
@@ -20,40 +17,70 @@ interface LocationTrackerProps {
   children: ReactNode;
 }
 
-const LoctionTrackerCareTaker: React.FC<LocationTrackerProps> = ({ children }) => {
+const LocationTrackerCareTaker: React.FC<LocationTrackerProps> = ({ children }) => {
   const [location, setLocation] = useState<LocationData | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [patientId, setPatientId] = useState<string | null>(null);
 
+  // Haetaan käyttäjän ja potilaan ID:t AsyncStoragesta
   useEffect(() => {
-    let subscription: Location.LocationSubscription | null = null;
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Sijaintiluvan saaminen epäonnistui");
-        return;
-      }
-      
-      subscription = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 20000,  // Päivittää sijainnin 10 sekunnin välein
-          distanceInterval: 0,
-        },
-        (locationData) => {
-          setLocation({
-            latitude: locationData.coords.latitude,
-            longitude: locationData.coords.longitude,
-          });
+    const fetchIds = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem("userId");
+        const storedPatientId = await AsyncStorage.getItem("patientId");
+        console.log("Fetched IDs from AsyncStorage:", storedUserId, storedPatientId);
+        if (storedUserId && storedPatientId) {
+          setUserId(storedUserId);
+          setPatientId(storedPatientId);
+        } else {
+          console.error("User ID tai Patient ID puuttuu AsyncStoragesta");
         }
-      );
-    })();
-
-    return () => {
-      if (subscription) {
-        subscription.remove();
+      } catch (error) {
+        console.error("Virhe ID:iden haussa:", error);
       }
     };
+
+    fetchIds();
   }, []);
+
+  // Kun ID:t ovat saatavilla, haetaan potilaan sijainti tietokannasta
+  useEffect(() => {
+    if (!userId || !patientId) {
+      console.log("UserId tai patientId ei ole vielä saatavilla, ei haeta sijaintia.");
+      return;
+    }
+
+    const fetchLocationFromDB = async () => {
+      try {
+        const data = await getPatientLocation(userId, patientId);
+        console.log("API-vastaus:", data);
+        // Jos data on taulukko, otetaan ensimmäinen potilaan tietue
+        const patient = Array.isArray(data) ? data[0] : data;
+        console.log("Potilasdata:", patient);
+        if (patient && patient.location) {
+          console.log("Potilaan sijainti:", patient.location);
+          const newLocation = {
+            latitude: patient.location.latitude,
+            longitude: patient.location.longitude,
+          };
+          // Tulostetaan päivitetyt latitude ja longitude arvot konsoliin
+          console.log("Updated location: Latitude:", newLocation.latitude, "Longitude:", newLocation.longitude);
+          setLocation(newLocation);
+        } else {
+          console.error("Potilaan sijaintitiedot puuttuvat API-vastauksesta.");
+        }
+      } catch (error) {
+        console.error("Virhe potilaan sijainnin haussa:", error);
+      }
+    };
+
+    // Haetaan sijainti heti, kun ID:t ovat saatavilla
+    fetchLocationFromDB();
+    // Päivitetään sijainti 10 sekunnin välein
+    const intervalId = setInterval(fetchLocationFromDB, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [userId, patientId]);
 
   return (
     <LocationContext.Provider value={{ location }}>
@@ -62,4 +89,4 @@ const LoctionTrackerCareTaker: React.FC<LocationTrackerProps> = ({ children }) =
   );
 };
 
-export default LoctionTrackerCareTaker;
+export default LocationTrackerCareTaker;

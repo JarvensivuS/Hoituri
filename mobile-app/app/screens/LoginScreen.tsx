@@ -37,39 +37,42 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ setScreen }) => {
         if (userData.relationships && userData.relationships.patientIds) {
           const caretakerPatientIds = userData.relationships.patientIds; // Array of patient IDs for this caretaker
           const allPatients = await getPatients(userData.id);
-          // Filter to only include patients that are in the caretaker's patientIds list
+          // Filteröidään potilaat, jotka kuuluvat caretakerin patientIds-listaan
           const filteredPatients = allPatients.filter((patient: any) =>
             caretakerPatientIds.includes(patient.id)
           );
           await AsyncStorage.setItem("patients", JSON.stringify(filteredPatients));
           console.log("Patient Info:", filteredPatients);
+          // Asetetaan oletuksena ensimmäisen potilaan id AsyncStorageen
+          if (filteredPatients.length > 0) {
+            await AsyncStorage.setItem("patientId", filteredPatients[0].id);
+            console.log("Default patientId set:", filteredPatients[0].id);
+          } else {
+            console.error("Ei löytynyt potilaita caretakerin alle.");
+          }
         }
         setScreen("CaretakerHome");
         console.log("caretaker");
       } else if (userData.role === "patient") {
+        // Potilaan tapauksessa patientId voi olla sama kuin userId
+        await AsyncStorage.setItem("patientId", userData.id);
         setScreen("Home");
-        console.log("patient")
+        console.log("patient");
       } else {
-        // Fallback in case the role isn't recognized
-        console.log("no role")
+        console.log("no role");
       }
-      //Alert.alert("Onnistui!", "Kirjautuminen onnistui!");
-      //setScreen("Home"); // Change screen after successful login
     } catch (err: unknown) {
       console.error("Login failed:", err);
       const errorMessage = (err as Error).message;
 
       if (errorMessage === "Doctors should use the web application") {
         setError("Lääkäreiden tulee käyttää web-sovellusta");
-        //Alert.alert("Virhe", "Vain lääkärit voivat kirjautua tähän sovellukseen");
       } else {
         setError("Virheelliset tunnukset");
-        //Alert.alert("Virhe", "Virheelliset tunnukset");
       }
     } finally {
       setLoading(false);
     }
-    
   };
 
   return (
