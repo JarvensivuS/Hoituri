@@ -96,7 +96,7 @@ const CareTakerLocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) =
     <View style={styles.locationScreenContainer}>
       <View style={styles.headerContainer}>
         {homeSet && outsideHome && (
-          <Text style={styles.warningText}>OLET KODIN ULKOPUOLELLA!</Text>
+          <Text style={styles.warningText}>HOIDETTAVA ON KODIN ULKOPUOLELLA!</Text>
         )}
         <Text>Potilaan sijainti:</Text>
         <Text style={styles.ScreenText}>Latitude: {location.latitude.toFixed(6)}</Text>
