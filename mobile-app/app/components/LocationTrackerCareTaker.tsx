@@ -54,7 +54,7 @@ const LocationTrackerCareTaker: React.FC<LocationTrackerProps> = ({ children }) 
       try {
         const data = await getPatientLocation(userId, patientId);
         console.log("API-vastaus:", data);
-        // Jos data on taulukko, otetaan ensimmäinen potilaan tietue
+        
         const patient = Array.isArray(data) ? data[0] : data;
         console.log("Potilasdata:", patient);
         if (patient && patient.location) {
@@ -76,7 +76,7 @@ const LocationTrackerCareTaker: React.FC<LocationTrackerProps> = ({ children }) 
 
     // Haetaan sijainti heti, kun ID:t ovat saatavilla
     fetchLocationFromDB();
-    // Päivitetään sijainti 50 sekunnin välein
+    // Päivitetään sijainti 5 sekunnin välein
     const intervalId = setInterval(fetchLocationFromDB, 5000);
 
     return () => clearInterval(intervalId);
