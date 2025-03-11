@@ -32,7 +32,7 @@ export const HomeProvider: React.FC<HomeProviderProps> = ({ children }) => {
         if (userId && patientId) {
           const data = await getPatientHomeLocation(userId, patientId);
           console.log("Fetched homeLocation from DB:", data);
-          // Tarkista, missä muodossa data saapuu:
+          
           if (data && data.homeLocation) {
             setHomeLocation(data.homeLocation);
             setHomeSet(true);

@@ -76,7 +76,7 @@ const CareTakerLocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) =
               attribution: '© OpenStreetMap contributors'
             }).addTo(map);
             L.marker([${location.latitude}, ${location.longitude}]).addTo(map)
-              .bindPopup("Olet tässä")
+              .bindPopup("Hoidettava")
               .openPopup();
             ${rectangleCode}
           </script>
@@ -85,12 +85,7 @@ const CareTakerLocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) =
     `;
   };
 
-  // Esimerkkitoiminto "Aseta koti" (jos haluat käyttää)
-  const handleSetHome = () => {
-    setHomeLocation(location);
-    setHomeSet(true);
-    Alert.alert("Koti asetettu", "Oletus kotisijainti on asetettu.");
-  };
+  
 
   return (
     <View style={styles.locationScreenContainer}>
@@ -98,19 +93,14 @@ const CareTakerLocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) =
         {homeSet && outsideHome && (
           <Text style={styles.warningText}>HOIDETTAVA ON KODIN ULKOPUOLELLA!</Text>
         )}
-        <Text>Potilaan sijainti:</Text>
+        <Text>Hoidettavan GPS-koordinaatit:</Text>
         <Text style={styles.ScreenText}>Latitude: {location.latitude.toFixed(6)}</Text>
         <Text style={styles.ScreenText}>Longitude: {location.longitude.toFixed(6)}</Text>
       </View>
       <View style={styles.mapContainer}>
         <WebView originWhitelist={["*"]} source={{ html: getHtmlContent() }} style={styles.webview} />
       </View>
-      <View style={styles.bottomContainer}>
-        {/* Voit lisätä napin, jolla asetetaan koti, jos haluat
-        <TouchableOpacity onPress={handleSetHome} style={styles.homeButton}>
-          <Text style={styles.homeButtonText}>Aseta koti</Text>
-        </TouchableOpacity> */}
-      </View>
+      
     </View>
   );
 };

@@ -120,7 +120,7 @@ const PatientLocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => 
         {homeSet && outsideHome && (
           <Text style={styles.warningText}>OLET KODIN ULKOPUOLELLA!</Text>
         )}
-        <Text>PATIENT LOCATION</Text>
+        <Text>GPS-koordinaattisi:</Text>
         <Text style={styles.ScreenText}>Latitude: {location.latitude.toFixed(6)}</Text>
         <Text style={styles.ScreenText}>Longitude: {location.longitude.toFixed(6)}</Text>
       </View>

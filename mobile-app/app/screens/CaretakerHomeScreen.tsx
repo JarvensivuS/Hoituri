@@ -104,7 +104,7 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
       {/* Top section with caretaker and patient names and real-time info */}
       <View style={{ alignItems: "center", marginBottom: 20 }}>
         <Text style={styles.ScreenText}>Käyttäjä: {caretakerName}</Text>
-        <Text style={styles.ScreenText}>Potilas: {patientName}</Text>
+        <Text style={styles.ScreenText}>Hoidettava: {patientName}</Text>
         <Text style={{ fontSize: 20, fontWeight: "bold" }}>Tänään on {weekday}</Text>
         <Text style={{ fontSize: 16 }}>{date}</Text>
         <Text style={{ fontSize: 16 }}>{time}</Text>
@@ -117,7 +117,7 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
           patientsPrescriptions.map((patient) => (
             <View key={patient.id} style={{ marginBottom: 20 }}>
               <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                Potilas: {patient.userName || patient.name}
+                Hoidettava: {patient.userName || patient.name}
               </Text>
               {patient.prescriptions && patient.prescriptions.length > 0 ? (
                 // Sort each patient's prescriptions by day (frequency) and then by time.
@@ -173,12 +173,12 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
                     );
                   })
               ) : (
-                <Text>Ei reseptejä tälle potilaalle.</Text>
+                <Text>Ei reseptejä tälle hoidettavalle.</Text>
               )}
             </View>
           ))
         ) : (
-          <Text>Ei potilaan tietoja saatavilla.</Text>
+          <Text>Ei hoidettavan tietoja saatavilla.</Text>
         )}
       </ScrollView>
     </View>

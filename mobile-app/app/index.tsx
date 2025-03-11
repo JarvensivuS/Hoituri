@@ -86,13 +86,13 @@ const App = () => {
 
               <Text style={styles.titleText}>
                 {screen === "Home"
-                  ? "Aloitus (patient)"
+                  ? "Aloitus"
                   : screen === "CaretakerHome"
-                  ? "Aloitus (caretaker)"
+                  ? "Aloitus"
                   : screen === "PatientLocationScreen"
-                  ? "Sijainti (patient)"
+                  ? "Sijainti"
                   : screen === "CaretakerLocationScreen"
-                  ? "Sijainti (caretaker)"
+                  ? "Sijainti"
                   : "Kirjautuminen"}
               </Text>
 
@@ -162,13 +162,13 @@ const App = () => {
 
               <Text style={styles.titleText}>
                 {screen === "Home"
-                  ? "Aloitus (patient)"
+                  ? "Aloitus"
                   : screen === "CaretakerHome"
-                  ? "Aloitus (caretaker)"
+                  ? "Aloitus"
                   : screen === "PatientLocationScreen"
-                  ? "Sijainti (patient)"
+                  ? "Sijainti"
                   : screen === "CaretakerLocationScreen"
-                  ? "Sijainti (caretaker)"
+                  ? "Sijainti"
                   : "Kirjautuminen"}
               </Text>
 
