@@ -55,13 +55,11 @@ export const getPatientLocation = async (userId, patientId) => {
 // Request Body: { "latitude": number, "longitude": number, "isHome": boolean }
 export const updatePatientLocation = async (patientId, locationData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${patientId}/location`, {
+    const response = await fetch(`${API_BASE_URL}/patients/${patientId}/location`, { // Muutettu reitti
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        // Oletetaan, että potilaan käyttäjä-id on sama kuin patientId,
-        // mikäli ei näin, vaihda vastaavaan muuttujaan
-        'user-id': patientId 
+        'user-id': patientId
       },
       body: JSON.stringify({
         latitude: locationData.latitude,
@@ -81,6 +79,7 @@ export const updatePatientLocation = async (patientId, locationData) => {
     throw error;
   }
 };
+
 
 export const managePatientCaretaker = async (doctorId, patientId, caretakerId, action) => {
   try {

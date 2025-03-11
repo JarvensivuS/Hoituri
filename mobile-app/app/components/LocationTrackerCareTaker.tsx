@@ -76,8 +76,8 @@ const LocationTrackerCareTaker: React.FC<LocationTrackerProps> = ({ children }) 
 
     // Haetaan sijainti heti, kun ID:t ovat saatavilla
     fetchLocationFromDB();
-    // Päivitetään sijainti 10 sekunnin välein
-    const intervalId = setInterval(fetchLocationFromDB, 10000);
+    // Päivitetään sijainti 50 sekunnin välein
+    const intervalId = setInterval(fetchLocationFromDB, 5000);
 
     return () => clearInterval(intervalId);
   }, [userId, patientId]);
