@@ -102,6 +102,35 @@ export const getPatientHomeLocation = async (userId, patientId) => {
   }
 };
 
+export const updatePatientHomeLocation = async (patientId, { latitude, longitude }) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/patients/${patientId}/homelocation`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'user-id': patientId,
+      },
+      body: JSON.stringify({ latitude, longitude }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update patient home location');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating patient home location:', error);
+    throw error;
+  }
+};
+
+
+
+
+
+
+
 
 
 
