@@ -104,7 +104,7 @@ export const getPatientHomeLocation = async (userId, patientId) => {
 
 export const updatePatientHomeLocation = async (patientId, { latitude, longitude }) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/patients/${patientId}/homelocation`, {
+    const response = await fetch(`${API_BASE_URL}/patients/${patientId}/homeLocation`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
