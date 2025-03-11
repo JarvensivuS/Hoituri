@@ -48,13 +48,14 @@ export const getPatientLocation = async (userId, patientId) => {
   }
 };
 
+
 // Uusi metodi: Potilaan näkökulmasta oman sijainnin lähettäminen patient-tauluun
 // Endpoint: PUT /patients/:patientId/location
 // Headers: user-id: {userId}, Content-Type: application/json
 // Request Body: { "latitude": number, "longitude": number, "isHome": boolean }
 export const updatePatientLocation = async (patientId, locationData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/patients/${patientId}/location`, {
+    const response = await fetch(`${API_BASE_URL}/users/${patientId}/location`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

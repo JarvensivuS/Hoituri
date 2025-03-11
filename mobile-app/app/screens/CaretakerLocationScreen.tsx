@@ -1,4 +1,3 @@
-// screens/LocationScreen.tsx
 import React, { useContext, useMemo } from "react";
 import { View, Text, Alert, TouchableOpacity, ActivityIndicator } from "react-native";
 import { WebView } from "react-native-webview";
@@ -10,18 +9,21 @@ interface LocationScreenProps {
   setScreen: (screen: string) => void;
 }
 
-const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
+const CareTakerLocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
   const { location } = useContext(LocationContext);
   const { homeSet, homeLocation, setHomeSet, setHomeLocation } = useContext(HomeContext);
 
+  // Näytetään latausviesti, jos sijaintia ei ole vielä haettu
   if (!location) {
     return (
       <View style={[styles.locationScreenContainer, { alignItems: "center", justifyContent: "center" }]}>
         <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Haetaan sijaintitietoja...</Text>
       </View>
     );
   }
 
+  // Lasketaan, onko potilas kotialueen ulkopuolella
   const outsideHome = useMemo(() => {
     if (homeSet && homeLocation) {
       const latOffset = 50 / 111320;
@@ -40,6 +42,7 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
     return false;
   }, [homeSet, homeLocation, location]);
 
+  // Muodostetaan HTML-sisältö karttaa varten
   const getHtmlContent = (): string => {
     let rectangleCode = "";
     if (homeSet && homeLocation) {
@@ -82,6 +85,7 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
     `;
   };
 
+  // Esimerkkitoiminto "Aseta koti" (jos haluat käyttää)
   const handleSetHome = () => {
     setHomeLocation(location);
     setHomeSet(true);
@@ -92,9 +96,9 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
     <View style={styles.locationScreenContainer}>
       <View style={styles.headerContainer}>
         {homeSet && outsideHome && (
-          <Text style={styles.warningText}>HOIDETTAVA ON KODIN ULKOPUOLELLA!</Text>
+          <Text style={styles.warningText}>OLET KODIN ULKOPUOLELLA!</Text>
         )}
-        <Text >CARETAKERLOKATION</Text>
+        <Text>Potilaan sijainti:</Text>
         <Text style={styles.ScreenText}>Latitude: {location.latitude.toFixed(6)}</Text>
         <Text style={styles.ScreenText}>Longitude: {location.longitude.toFixed(6)}</Text>
       </View>
@@ -102,7 +106,8 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
         <WebView originWhitelist={["*"]} source={{ html: getHtmlContent() }} style={styles.webview} />
       </View>
       <View style={styles.bottomContainer}>
-       {/* <TouchableOpacity onPress={handleSetHome} style={styles.homeButton}>
+        {/* Voit lisätä napin, jolla asetetaan koti, jos haluat
+        <TouchableOpacity onPress={handleSetHome} style={styles.homeButton}>
           <Text style={styles.homeButtonText}>Aseta koti</Text>
         </TouchableOpacity> */}
       </View>
@@ -110,4 +115,4 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => {
   );
 };
 
-export default LocationScreen;
+export default CareTakerLocationScreen;
