@@ -115,3 +115,49 @@ export const updatePatientLocation = async (req: Request, res: Response): Promis
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const updatePatientHomeLocation = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { patientId } = req.params;
+    const { latitude, longitude } = req.body;
+    const requestingUser = (req as AuthenticatedRequest).user;
+
+    if (!requestingUser) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    // Vain potilas voi päivittää oman kotisijaintinsa
+    if (!(requestingUser.role === 'patient' && requestingUser.id === patientId)) {
+      res.status(403).json({ error: 'Forbidden - Only patients can update their own home location' });
+      return;
+    }
+
+    // Tarkistetaan, että potilas on olemassa
+    const patientDoc = await db.collection('users').doc(patientId).get();
+    if (!patientDoc.exists) {
+      res.status(404).json({ error: 'Patient not found' });
+      return;
+    }
+
+    // Päivitetään homeLocation-tieto
+    const updateData = {
+      homeLocation: {
+        latitude,
+        longitude
+      },
+      updatedAt: new Date().toISOString()
+    };
+
+    await db.collection('users').doc(patientId).update(updateData);
+
+    res.status(200).json({
+      id: patientId,
+      homeLocation: updateData.homeLocation
+    });
+  } catch (error) {
+    console.error('Error updating patient home location:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+

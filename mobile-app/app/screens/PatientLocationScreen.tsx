@@ -5,6 +5,9 @@ import { WebView } from "react-native-webview";
 import { LocationContext } from "../components/LocationTracker";
 import { HomeContext } from "../components/HomeContext";
 import styles from "../styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { updatePatientHomeLocation } from "../services/apiMobile";
+
 
 interface LocationScreenProps {
   setScreen: (screen: string) => void;
@@ -82,11 +85,34 @@ const PatientLocationScreen: React.FC<LocationScreenProps> = ({ setScreen }) => 
     `;
   };
 
-  const handleSetHome = () => {
-    setHomeLocation(location);
-    setHomeSet(true);
-    Alert.alert("Koti asetettu", "Oletus kotisijainti on asetettu.");
-  };
+  
+  
+  // ...
+  
+  const handleSetHome = async () => {
+    try {
+      const patientId = await AsyncStorage.getItem("patientId");
+      if (patientId) {
+        const response = await updatePatientHomeLocation(patientId, {
+          latitude: location.latitude,
+          longitude: location.longitude,
+        });
+        console.log("Home location update response:", response);
+        // Päivitetään HomeContext
+        setHomeLocation(location);
+        setHomeSet(true);
+        Alert.alert("Koti asetettu", "Oletus kotisijainti on asetettu.");
+      } else {
+        console.error("Patient ID ei löytynyt AsyncStoragesta");
+      }
+    } catch (error) {
+      console.error("Virhe kodin sijainnin päivittämisessä tietokantaan:", error);
+      Alert.alert("Virhe", "Kodin sijainnin päivitys epäonnistui.");
+    }
+  }
+  
+  
+  
 
   return (
     <View style={styles.locationScreenContainer}>
