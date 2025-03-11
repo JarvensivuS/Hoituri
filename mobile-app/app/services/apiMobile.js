@@ -80,6 +80,30 @@ export const updatePatientLocation = async (patientId, locationData) => {
   }
 };
 
+export const getPatientHomeLocation = async (userId, patientId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/patients/${patientId}/location`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'user-id': userId,
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to fetch patient home location');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching patient home location:', error);
+    throw error;
+  }
+};
+
+
+
 
 export const managePatientCaretaker = async (doctorId, patientId, caretakerId, action) => {
   try {
