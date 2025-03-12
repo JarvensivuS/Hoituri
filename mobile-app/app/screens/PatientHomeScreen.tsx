@@ -16,7 +16,7 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Update the current time every second
+  // Päivitetään nykyinen aika sekunnin välein
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCurrentDateTime(new Date());
@@ -24,7 +24,7 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Load patient details and fetch prescriptions
+  // Ladataan potilaan tiedot ja haetaan reseptit
   useEffect(() => {
     const loadUserDetailsAndPrescriptions = async () => {
       try {
@@ -37,9 +37,10 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
           setPatientId(storedId);
           const data = await getPrescriptions(storedId);
           setPrescriptions(data);
+          console.log("Ladatut reseptit:", data);
         }
       } catch (error) {
-        console.error("Error loading user details or prescriptions", error);
+        console.error("Virhe käyttäjätietojen tai reseptien latauksessa", error);
       } finally {
         setLoading(false);
       }
@@ -48,7 +49,7 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
     loadUserDetailsAndPrescriptions();
   }, []);
 
-  // Get current date and time strings
+  // Muodostetaan nykyiset päivämäärä- ja kellonaikatiedot
   const weekday = currentDateTime.toLocaleDateString("fi-FI", { weekday: "long" });
   const date = currentDateTime.toLocaleDateString("fi-FI", {
     day: "numeric",
@@ -57,7 +58,12 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
   });
   const time = currentDateTime.toLocaleTimeString("fi-FI");
 
-  // Define weekday order mapping
+  // Normalisointi: poistetaan mahdollinen loppuosa "na" esim. "keskiviikkona" -> "keskiviikko"
+  const normalizeDay = (day: string) => {
+    return day.trim().toLowerCase().replace(/na$/, "");
+  };
+
+  // Viikonpäivien kiinteä järjestys (normalisoitu muoto, esim. "maanantai")
   const daysOrder: { [key: string]: number } = {
     "maanantai": 1,
     "tiistai": 2,
@@ -68,20 +74,19 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
     "sunnuntai": 7,
   };
 
-  // Calculate the current day's index (default to 1 if not found)
-  const currentDayIndex = daysOrder[weekday.toLowerCase()] || 1;
+  // Lasketaan nykyisen päivän indeksi normalisoidulla arvolla
+  const currentDayIndex = daysOrder[normalizeDay(weekday)] || 1;
 
-  // Helper function: if the prescription's frequency (day) is not recognized, return 1
+  // Apufunktio, joka palauttaa reseptin frequency:n järjestysnumeron normalisoidulla arvolla
   const getDayOrder = (dayStr: string | undefined) => {
-    if (dayStr && daysOrder[dayStr.toLowerCase()]) {
-      return daysOrder[dayStr.toLowerCase()];
-    }
-    return 1;
+    if (!dayStr) return 1;
+    const normalized = normalizeDay(dayStr);
+    return daysOrder[normalized] || 1;
   };
 
-  // Sort prescriptions based on their "frequency" (i.e. day) relative to today.
-  // If the frequency isn't one of the defined days, it's given order 1.
-  // If two prescriptions are on the same day, sort them by time (using the first time in reminderSettings.times).
+  // Lajitellaan reseptit suhteessa nykyiseen päivään:
+  // Laske "etäisyys" nykyisestä päivästä (0 = tänään, 1 = huomenna jne.)
+  // Jos kaksi reseptiä ovat samalla päivällä, lajitellaan myös kellonaikojen mukaan.
   const sortedPrescriptions = prescriptions.slice().sort((a, b) => {
     const aDayOrder = getDayOrder(a.frequency);
     const bDayOrder = getDayOrder(b.frequency);
@@ -90,7 +95,6 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
     if (relativeA !== relativeB) {
       return relativeA - relativeB;
     }
-    // If on the same day, sort by time.
     let aTime = "";
     let bTime = "";
     if (a.reminderSettings && a.reminderSettings.times) {
@@ -108,7 +112,7 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
 
   return (
     <View style={styles.ScreenContainer}>
-      {/* Header with real-time info */}
+      {/* Ylätunniste reaaliaikaisilla tiedoilla */}
       <View style={{ alignItems: "center", marginBottom: 20 }}>
         <Text style={styles.ScreenText}>Käyttäjä: {patientName}</Text>
         <Text style={{ fontSize: 20, fontWeight: "bold" }}>Tänään on {weekday}</Text>
@@ -116,7 +120,7 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
         <Text style={{ fontSize: 16 }}>{time}</Text>
       </View>
 
-      {/* Prescription details (sorted) */}
+      {/* Reseptien tiedot (lajiteltuna suhteessa nykyiseen päivään) */}
       <ScrollView style={{ width: "100%" }} contentContainerStyle={{ paddingBottom: 20 }}>
         {loading ? (
           <Text>Ladataan reseptejä...</Text>
@@ -128,6 +132,10 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
                 ? item.reminderSettings.times.join(", ")
                 : item.reminderSettings.times;
             }
+            // Normalisoidaan reseptin frequency ja vertaillaan nykyiseen päivän normalisoituun muotoon
+            const normalizedFrequency = item.frequency ? normalizeDay(item.frequency) : "";
+            const isToday = normalizedFrequency === normalizeDay(weekday);
+
             return (
               <View
                 key={index}
@@ -138,6 +146,7 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
                   marginVertical: 5,
                   borderRadius: 5,
                   width: "100%",
+                  backgroundColor: isToday ? "lightblue" : "white",
                 }}
               >
                 <Text>Lääke: {item.medication || "Ei määritelty"}</Text>
@@ -152,7 +161,7 @@ const PatientHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
         )}
       </ScrollView>
 
-      {/* Emergency button */}
+      {/* Hätäpainike */}
       <View style={{ alignItems: "center", marginVertical: 20 }}>
         <TouchableOpacity
           onPress={() => setEmergencyPressed((prev) => !prev)}
