@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://192.168.1.103:3001/api'; // Käytä omaa IP:tä (ipconfig-komennolla)
+
+const API_BASE_URL = 'http://oma ip osoite:3001/api'; // Käytä omaa IP:tä (ipconfig-komennolla)
 
 // Kirjautuminen
 export const loginUser = async (email, password, platform = 'mobile') => {
