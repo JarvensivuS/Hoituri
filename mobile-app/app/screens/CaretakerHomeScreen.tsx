@@ -15,7 +15,7 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
   const [patientsPrescriptions, setPatientsPrescriptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Update current time every second
+  // Päivitetään nykyinen aika sekunnin välein
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCurrentDateTime(new Date());
@@ -23,25 +23,25 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
 
     const loadUserData = async () => {
       try {
-        // Get caretaker's name
+        // Haetaan hoitajan nimi
         const storedName = await AsyncStorage.getItem("userName");
         if (storedName) {
           setCaretakerName(storedName);
         }
-        // Get patients data saved during login
+        // Haetaan sisäänkirjautumisen yhteydessä tallennetut hoidettavien tiedot
         const storedPatients = await AsyncStorage.getItem("patients");
         console.log("Stored patients:", storedPatients);
         if (storedPatients) {
           const patients = JSON.parse(storedPatients);
           console.log("Parsed patients:", patients);
           if (patients.length > 0) {
-            // Join patient names to display at the top
+            // Yhdistetään hoidettavien nimet näytettäväksi
             const names = patients
               .map((patient: any) => patient.userName || patient.name)
               .join(", ");
             setPatientName(names);
 
-            // For each patient, fetch their prescriptions
+            // Haetaan kunkin hoidettavan reseptit
             const patientsPresc = await Promise.all(
               patients.map(async (patient: any) => {
                 try {
@@ -67,7 +67,7 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Get current date/time strings
+  // Haetaan nykyiset päivämäärä- ja kellonaikatiedot
   const weekday = currentDateTime.toLocaleDateString("fi-FI", { weekday: "long" });
   const date = currentDateTime.toLocaleDateString("fi-FI", {
     day: "numeric",
@@ -76,7 +76,12 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
   });
   const time = currentDateTime.toLocaleTimeString("fi-FI");
 
-  // Define weekday order mapping
+  // Normalisointifunktio: muuttaa viikonpäivän pieniksi kirjaimiksi ja poistaa mahdollisen loppuosan "na"
+  const normalizeDay = (day: string) => {
+    return day.trim().toLowerCase().replace(/na$/, "");
+  };
+
+  // Viikonpäivien järjestys (normalisoidut muodot)
   const daysOrder: { [key: string]: number } = {
     "maanantai": 1,
     "tiistai": 2,
@@ -87,21 +92,20 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
     "sunnuntai": 7,
   };
 
-  // Calculate current day's index (default to 1 if not found)
-  const currentDayIndex = daysOrder[weekday.toLowerCase()] || 1;
+  // Lasketaan nykyisen päivän indeksi käyttäen normalisoitua muotoa
+  const currentDayIndex = daysOrder[normalizeDay(weekday)] || 1;
 
-  // Helper function to get the day order from the prescription frequency.
-  // If the frequency isn't one of the defined days, it defaults to 1.
+  // Apufunktio, joka palauttaa reseptin frequency-arvon järjestysnumeron normalisoidun arvon perusteella
   const getDayOrder = (dayStr: string | undefined) => {
-    if (dayStr && daysOrder[dayStr.toLowerCase()]) {
-      return daysOrder[dayStr.toLowerCase()];
+    if (dayStr) {
+      return daysOrder[normalizeDay(dayStr)] || 1;
     }
     return 1;
   };
 
   return (
     <View style={styles.ScreenContainer}>
-      {/* Top section with caretaker and patient names and real-time info */}
+      {/* Ylätunniste: hoitajan ja hoidettavan nimet sekä reaaliaikaiset tiedot */}
       <View style={{ alignItems: "center", marginBottom: 20 }}>
         <Text style={styles.ScreenText}>Käyttäjä: {caretakerName}</Text>
         <Text style={styles.ScreenText}>Hoidettava: {patientName}</Text>
@@ -120,7 +124,8 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
                 Hoidettava: {patient.userName || patient.name}
               </Text>
               {patient.prescriptions && patient.prescriptions.length > 0 ? (
-                // Sort each patient's prescriptions by day (frequency) and then by time.
+                // Lajitellaan kunkin hoidettavan reseptit nykyiseen päivään nähden:
+                // Lasketaan etäisyys nykyisestä päivästä (0 = tänään, 1 = huomenna jne.) ja järjestetään kellonaikojen mukaan saman päivän sisällä
                 patient.prescriptions
                   .slice()
                   .sort((a: any, b: any) => {
@@ -128,10 +133,11 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
                     const bDayOrder = getDayOrder(b.frequency);
                     const relativeA = (aDayOrder - currentDayIndex + 7) % 7;
                     const relativeB = (bDayOrder - currentDayIndex + 7) % 7;
+                    
                     if (relativeA !== relativeB) {
                       return relativeA - relativeB;
                     }
-                    // If on the same day, sort by time (using the first time if an array)
+                    // Jos samalle päivälle, järjestetään kellonaikojen mukaan.
                     let aTime = "";
                     let bTime = "";
                     if (a.reminderSettings && a.reminderSettings.times) {
@@ -147,7 +153,10 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
                     return aTime.localeCompare(bTime);
                   })
                   .map((prescription: any, index: number) => {
-                    // Prepare times display from reminderSettings.times
+                    // Normalisoidaan reseptin frequency ja vertaillaan nykyiseen päivän normalisoituun muotoon
+                    const normalizedFrequency = prescription.frequency ? normalizeDay(prescription.frequency) : "";
+                    const isToday = normalizedFrequency === normalizeDay(weekday);
+                    // Muodostetaan kellonaikaesitys
                     let timesDisplay = "Ei määritelty";
                     if (prescription.reminderSettings && prescription.reminderSettings.times) {
                       timesDisplay = Array.isArray(prescription.reminderSettings.times)
@@ -163,6 +172,7 @@ const CaretakerHomeScreen: React.FC<HomeScreenProps> = ({ setScreen }) => {
                           padding: 10,
                           marginVertical: 5,
                           borderRadius: 5,
+                          backgroundColor: isToday ? "lightblue" : "white",
                         }}
                       >
                         <Text>Lääke: {prescription.medication || "Ei määritelty"}</Text>
