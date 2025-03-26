@@ -29,7 +29,7 @@ As the lead backend developer and architecture planner for this project, I desig
 
 The application follows a modular client-server architecture designed for scalability and maintainability:
 
-![System Architecture Diagram](https://github.com/user-attachments/assets/7f465f64-e481-41f1-94c8-2cdb54041ffc)
+![System Architecture Diagram](https://github.com/user-attachments/assets/32468134-ea81-4c5d-b60d-666b037fcb22)
 
 The system consists of three main components:
 
@@ -39,7 +39,7 @@ The system consists of three main components:
 
 ### Backend Architecture (UML)
 
-![Backend UML Diagram](https://github.com/user-attachments/assets/a9e1c19a-6ed3-4b67-8837-094f58a9b35d)
+![Backend UML Diagram](https://github.com/user-attachments/assets/fb0ba804-d5dc-4ec1-ad3d-5f8fde4e4f82)
 
 The backend follows a controller-service-repository pattern that separates concerns and enables effective testing:
 - **Controllers**: Handle HTTP requests and responses
@@ -142,10 +142,10 @@ The relationship system includes:
 ## Web Application Screenshots
 
 ### Doctor Dashboard - Patient Management
-![Patient Management](https://github.com/user-attachments/assets/06af4db9-377c-48e2-ab03-fed9ca69d742)
+![Patient Management](https://github.com/user-attachments/assets/f9f8257f-535f-480c-9917-8a8b38d8ec79)
 
 ### Medication Management Interface
-![Medication Management](https://github.com/user-attachments/assets/4fb01c5e-bfb8-4d5c-9bee-d8af6493a420)
+![Medication Management](https://github.com/user-attachments/assets/c9289689-c45f-43cb-884d-0ba611bebd53)
 
 ## Testing and Deployment
 
@@ -208,7 +208,7 @@ jobs:
 - Add comprehensive analytics for medication adherence
 - Expand the API to support additional healthcare integrations
 - Improve automated testing coverage
-  
+
 ## Contact
 
 For questions about my contributions to this project, please reach out to me at:
@@ -216,7 +216,8 @@ For questions about my contributions to this project, please reach out to me at:
 - Email: samuli.jarvensivu@gmail.com
 - LinkedIn: [@samulijarvensivu](https://www.linkedin.com/in/samulijarvensivu/)
 - GitHub: [@JarvensivuS](https://github.com/JarvensivuS)
-
 ---
 
 This project was developed as part of a team thesis at Oulu University of Applied Sciences (OAMK) in Spring 2025.
+
+For more detailed information, please see the thesis: [Hoituri – Teoriatietoon pohjautuva sovellus ikäihmisten hoidon tueksi](https://urn.fi/URN:NBN:fi:amk-202503194514)
